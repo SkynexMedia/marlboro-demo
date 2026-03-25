@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///C:/Users/jarek/Downloads/index_9.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="en">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>SKYNEX Media — Site Viewer</title>
-<link rel="stylesheet" href="./index_files/leaflet.css">
-<script src="./index_files/leaflet.js.download"></script>
-<script src="./index_files/index.js.download"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-side-by-side@2.0.0/index.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#e0e0e0;overflow:hidden;height:100vh;height:100dvh;width:100vw;-webkit-tap-highlight-color:transparent}
@@ -250,49 +250,49 @@ body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-seri
 </div>
 
 <div class="mob-toggle" id="mob-toggle" onclick="toggleMobToolbar()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
 </div>
 <div class="mob-layer-toggle" id="mob-layer-toggle" onclick="toggleMobLayers()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 22,8.5 12,15 2,8.5"></polygon><polyline points="2,15.5 12,22 22,15.5"></polyline></svg>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 22,8.5 12,15 2,8.5"/><polyline points="2,15.5 12,22 22,15.5"/></svg>
 </div>
 
 <!-- TOOLBAR -->
 <div class="toolbar" id="toolbar">
-  <div class="tool-btn" id="tool-single" onclick="activateTool(&#39;single&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="19" x2="19" y2="5"></line><circle cx="5" cy="19" r="2.5" fill="currentColor" stroke="none"></circle><circle cx="19" cy="5" r="2.5" fill="currentColor" stroke="none"></circle></svg><span class="tt">Distance (A\u2192B)</span></div>
-  <div class="tool-btn" id="tool-chain" onclick="activateTool(&#39;chain&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,20 9,8 15,16 21,4"></polyline><circle cx="3" cy="20" r="2" fill="currentColor" stroke="none"></circle><circle cx="9" cy="8" r="2" fill="currentColor" stroke="none"></circle><circle cx="15" cy="16" r="2" fill="currentColor" stroke="none"></circle><circle cx="21" cy="4" r="2" fill="currentColor" stroke="none"></circle></svg><span class="tt">Chain Distance</span></div>
-  <div class="tool-btn" id="tool-area" onclick="activateTool(&#39;area&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3,18 9,3 21,6 18,21" fill="rgba(244,180,0,.12)"></polygon></svg><span class="tt">Measure Area</span></div>
-  <div class="tool-btn" id="tool-circle" onclick="activateTool(&#39;circle&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="3,2"></line><circle cx="3" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="21" cy="12" r="1.5" fill="currentColor" stroke="none"></circle></svg><span class="tt">Diameter / Radius</span></div>
-  <div class="tool-btn" id="tool-rect" onclick="activateTool(&#39;rect&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1" fill="rgba(244,180,0,.1)"></rect></svg><span class="tt">Rectangle Area</span></div>
+  <div class="tool-btn" id="tool-single" onclick="activateTool('single')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="19" x2="19" y2="5"/><circle cx="5" cy="19" r="2.5" fill="currentColor" stroke="none"/><circle cx="19" cy="5" r="2.5" fill="currentColor" stroke="none"/></svg><span class="tt">Distance (A\u2192B)</span></div>
+  <div class="tool-btn" id="tool-chain" onclick="activateTool('chain')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,20 9,8 15,16 21,4"/><circle cx="3" cy="20" r="2" fill="currentColor" stroke="none"/><circle cx="9" cy="8" r="2" fill="currentColor" stroke="none"/><circle cx="15" cy="16" r="2" fill="currentColor" stroke="none"/><circle cx="21" cy="4" r="2" fill="currentColor" stroke="none"/></svg><span class="tt">Chain Distance</span></div>
+  <div class="tool-btn" id="tool-area" onclick="activateTool('area')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3,18 9,3 21,6 18,21" fill="rgba(244,180,0,.12)"/></svg><span class="tt">Measure Area</span></div>
+  <div class="tool-btn" id="tool-circle" onclick="activateTool('circle')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="3,2"/><circle cx="3" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="21" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span class="tt">Diameter / Radius</span></div>
+  <div class="tool-btn" id="tool-rect" onclick="activateTool('rect')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1" fill="rgba(244,180,0,.1)"/></svg><span class="tt">Rectangle Area</span></div>
   <div class="tool-div"></div>
-  <div class="tool-btn" id="tool-pin" onclick="activateTool(&#39;pin&#39;)"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"></path></svg><span class="tt">Drop Pin</span></div>
-  <div class="tool-btn" id="tool-note" onclick="activateTool(&#39;note&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg><span class="tt">Add Note</span></div>
+  <div class="tool-btn" id="tool-pin" onclick="activateTool('pin')"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg><span class="tt">Drop Pin</span></div>
+  <div class="tool-btn" id="tool-note" onclick="activateTool('note')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span class="tt">Add Note</span></div>
   <div class="tool-div"></div>
-  <div class="tool-btn" id="tool-loupe" onclick="toggleLoupe()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="7"></circle><line x1="15" y1="15" x2="21" y2="21"></line></svg><span class="tt">Magnifier</span></div>
-  <div class="tool-btn" id="tool-compare" onclick="toggleCompare()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"></line><rect x="2" y="5" width="8" height="14" rx="1" fill="rgba(244,180,0,.1)"></rect><rect x="14" y="5" width="8" height="14" rx="1" fill="rgba(255,255,255,.05)"></rect></svg><span class="tt">Compare Mode</span></div>
-  <div class="tool-btn" id="tool-report" onclick="showReport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline><line x1="12" y1="12" x2="12" y2="18"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg><span class="tt">Export Report</span></div>
+  <div class="tool-btn" id="tool-loupe" onclick="toggleLoupe()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg><span class="tt">Magnifier</span></div>
+  <div class="tool-btn" id="tool-compare" onclick="toggleCompare()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><rect x="2" y="5" width="8" height="14" rx="1" fill="rgba(244,180,0,.1)"/><rect x="14" y="5" width="8" height="14" rx="1" fill="rgba(255,255,255,.05)"/></svg><span class="tt">Compare Mode</span></div>
+  <div class="tool-btn" id="tool-report" onclick="showReport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg><span class="tt">Export Report</span></div>
   <div class="tool-div"></div>
   <!-- Pen / Freehand Draw -->
-  <div class="tool-btn" id="tool-pen" onclick="activateTool(&#39;pen&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg><span class="tt">Freehand Draw</span></div>
+  <div class="tool-btn" id="tool-pen" onclick="activateTool('pen')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span class="tt">Freehand Draw</span></div>
   <!-- Screenshot -->
-  <div class="tool-btn" id="tool-screenshot" onclick="takeScreenshot()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="12" cy="12" r="3"></circle><path d="M3 7l2-2h3"></path><path d="M19 7l-2-2h-3"></path></svg><span class="tt">Screenshot</span></div>
+  <div class="tool-btn" id="tool-screenshot" onclick="takeScreenshot()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M3 7l2-2h3"/><path d="M19 7l-2-2h-3"/></svg><span class="tt">Screenshot</span></div>
   <!-- Print -->
-  <div class="tool-btn" id="tool-print" onclick="printMap()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"></polyline><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg><span class="tt">Print Map</span></div>
+  <div class="tool-btn" id="tool-print" onclick="printMap()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span class="tt">Print Map</span></div>
   <div class="tool-div"></div>
-  <div class="tool-btn" id="tool-clear" onclick="clearAll()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg><span class="tt">Clear All</span></div>
+  <div class="tool-btn" id="tool-clear" onclick="clearAll()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span class="tt">Clear All</span></div>
 </div>
 
 <!-- LAYER PANEL -->
 <div class="layer-panel" id="layer-panel">
   <div class="lt">Flight Date</div>
   <div class="date-select-wrap">
-    <select class="date-select" id="date-select" onchange="switchFlight(this.value)"><option value="0" selected="">Feb 21, 2026</option></select>
+    <select class="date-select" id="date-select" onchange="switchFlight(this.value)"></select>
   </div>
 
   <div class="ld"></div>
   <div class="lt">Units</div>
   <div class="date-select-wrap">
     <select class="date-select" id="unit-select" onchange="switchUnits(this.value)">
-      <option value="ft" selected="">Feet (ft)</option>
+      <option value="ft" selected>Feet (ft)</option>
       <option value="ft-in">Feet + Inches (5' 6")</option>
       <option value="ft-dec">Decimal Feet (5.50 ft)</option>
       <option value="m">Meters (m)</option>
@@ -302,40 +302,40 @@ body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-seri
   <div class="ld"></div>
   <div class="lt">Layers</div>
 
-  <div class="li" onclick="toggleLayer(&#39;ortho&#39;)"><div class="lc active" id="check-ortho"></div><span class="ll">Orthomosaic</span></div>
-  <div class="orow"><span class="olbl">Opacity</span><input type="range" class="oslider" id="op-ortho" min="0" max="100" value="90" oninput="setLayerOp(&#39;ortho&#39;,this.value)"><span class="oval" id="opval-ortho">100%</span></div>
+  <div class="li" onclick="toggleLayer('ortho')"><div class="lc active" id="check-ortho"></div><span class="ll">Orthomosaic</span></div>
+  <div class="orow"><span class="olbl">Opacity</span><input type="range" class="oslider" id="op-ortho" min="0" max="100" value="90" oninput="setLayerOp('ortho',this.value)"><span class="oval" id="opval-ortho">90%</span></div>
 
   <div class="ld"></div>
 
-  <div class="li" onclick="toggleLayer(&#39;satellite&#39;)"><div class="lc active" id="check-satellite"></div><span class="ll">Satellite</span></div>
-  <div class="orow"><span class="olbl">Opacity</span><input type="range" class="oslider" id="op-satellite" min="0" max="100" value="100" oninput="setLayerOp(&#39;satellite&#39;,this.value)"><span class="oval" id="opval-satellite">100%</span></div>
+  <div class="li" onclick="toggleLayer('satellite')"><div class="lc active" id="check-satellite"></div><span class="ll">Satellite</span></div>
+  <div class="orow"><span class="olbl">Opacity</span><input type="range" class="oslider" id="op-satellite" min="0" max="100" value="100" oninput="setLayerOp('satellite',this.value)"><span class="oval" id="opval-satellite">100%</span></div>
 
   <div class="ld"></div>
 
   <!-- CAD DRAWINGS — collapsible -->
   <div class="cad-header" onclick="toggleCadPanel()">
     <div class="lt" style="margin-bottom:0;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
-      CAD Drawings <span class="cad-arrow" id="cad-arrow">▶</span>
+      CAD Drawings <span class="cad-arrow" id="cad-arrow">&#9654;</span>
     </div>
   </div>
   <div class="cad-body" id="cad-body" style="display:none">
     <div id="cad-layers-list"></div>
-    <div class="cad-empty" id="cad-empty" style="font-size: 10px; color: rgba(255, 255, 255, 0.3); padding: 6px 0px; font-style: italic; display: block;">No CAD drawings loaded</div>
+    <div class="cad-empty" id="cad-empty" style="font-size:10px;color:rgba(255,255,255,.3);padding:6px 0;font-style:italic">No CAD drawings loaded</div>
   </div>
 
   <div class="ld"></div>
 
-  <div class="li" onclick="toggleLayer(&#39;contours&#39;)"><div class="lc" id="check-contours"></div><span class="ll">Contour Lines</span><span class="ltag">coming soon</span></div>
-  <div class="li" onclick="toggleLayer(&#39;gcps&#39;)"><div class="lc" id="check-gcps"></div><span class="ll">GCP Markers</span><span class="ltag">coming soon</span></div>
+  <div class="li" onclick="toggleLayer('contours')"><div class="lc" id="check-contours"></div><span class="ll">Contour Lines</span><span class="ltag">coming soon</span></div>
+  <div class="li" onclick="toggleLayer('gcps')"><div class="lc" id="check-gcps"></div><span class="ll">GCP Markers</span><span class="ltag">coming soon</span></div>
 </div>
 
 <div class="ds" id="ds"><div class="ds-t" id="ds-text">Flight Date: <strong>February 21, 2026</strong></div></div>
 
 <!-- COMPARE DATE SELECTORS -->
 <div class="compare-selectors" id="compare-selectors">
-  <label>Left</label><select id="cmp-left" onchange="updateCompare()"><option value="0" selected="">Feb 21, 2026</option><option value="satellite">Satellite (Esri)</option></select>
+  <label>Left</label><select id="cmp-left" onchange="updateCompare()"></select>
   <span class="compare-vs">vs</span>
-  <label>Right</label><select id="cmp-right" onchange="updateCompare()"><option value="0" selected="">Feb 21, 2026</option><option value="satellite" selected="">Satellite (Esri)</option></select>
+  <label>Right</label><select id="cmp-right" onchange="updateCompare()"></select>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -346,7 +346,7 @@ body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-seri
   <div class="ni-btns"><button class="btn-c" onclick="cancelNote()">Cancel</button><button class="btn-s" onclick="saveNote()">Save</button></div>
 </div>
 <div class="rp" id="rp">
-  <span class="rp-close" onclick="hideReport()">×</span>
+  <span class="rp-close" onclick="hideReport()">&times;</span>
   <h3>Annotation Report</h3>
   <div class="rs" id="rp-sub">SKYNEX Media — Marlboro Township</div>
   <div id="rpc"></div>
@@ -356,42 +356,42 @@ body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-seri
 <div class="pen-opts" id="pen-opts">
   <div class="pen-opts-title">Pen Color</div>
   <div class="pen-colors" id="pen-colors">
-    <div class="pen-color active" style="background:#F4B400" onclick="setPenColor(&#39;#F4B400&#39;,this)"></div>
-    <div class="pen-color" style="background:#FF3B30" onclick="setPenColor(&#39;#FF3B30&#39;,this)"></div>
-    <div class="pen-color" style="background:#34C759" onclick="setPenColor(&#39;#34C759&#39;,this)"></div>
-    <div class="pen-color" style="background:#007AFF" onclick="setPenColor(&#39;#007AFF&#39;,this)"></div>
-    <div class="pen-color" style="background:#FF9500" onclick="setPenColor(&#39;#FF9500&#39;,this)"></div>
-    <div class="pen-color" style="background:#AF52DE" onclick="setPenColor(&#39;#AF52DE&#39;,this)"></div>
-    <div class="pen-color" style="background:#ffffff" onclick="setPenColor(&#39;#ffffff&#39;,this)"></div>
+    <div class="pen-color active" style="background:#F4B400" onclick="setPenColor('#F4B400',this)"></div>
+    <div class="pen-color" style="background:#FF3B30" onclick="setPenColor('#FF3B30',this)"></div>
+    <div class="pen-color" style="background:#34C759" onclick="setPenColor('#34C759',this)"></div>
+    <div class="pen-color" style="background:#007AFF" onclick="setPenColor('#007AFF',this)"></div>
+    <div class="pen-color" style="background:#FF9500" onclick="setPenColor('#FF9500',this)"></div>
+    <div class="pen-color" style="background:#AF52DE" onclick="setPenColor('#AF52DE',this)"></div>
+    <div class="pen-color" style="background:#ffffff" onclick="setPenColor('#ffffff',this)"></div>
   </div>
   <div class="pen-width-row">
     <label>Width</label>
-    <input type="range" min="1" max="10" value="3" id="pen-width" oninput="penWidth=parseInt(this.value);document.getElementById(&#39;pw-val&#39;).textContent=this.value+&#39;px&#39;">
+    <input type="range" min="1" max="10" value="3" id="pen-width" oninput="penWidth=parseInt(this.value);document.getElementById('pw-val').textContent=this.value+'px'">
     <span id="pw-val">3px</span>
   </div>
 </div>
 
 <!-- DRAW CANVAS -->
-<canvas class="draw-canvas" id="draw-canvas" width="1528" height="732"></canvas>
+<canvas class="draw-canvas" id="draw-canvas"></canvas>
 
 <!-- SCREENSHOT FLASH -->
 <div class="screenshot-flash" id="ss-flash"></div>
 
 <!-- SCREENSHOT PREVIEW -->
 <div class="screenshot-preview" id="ss-preview">
-  <span class="sp-close" onclick="document.getElementById(&#39;ss-preview&#39;).style.display=&#39;none&#39;">×</span>
+  <span class="sp-close" onclick="document.getElementById('ss-preview').style.display='none'">&times;</span>
   <div class="sp-title">Screenshot Captured</div>
-  <img id="ss-img" src="file:///C:/Users/jarek/Downloads/index_9.html">
+  <img id="ss-img" src="">
   <div class="sp-actions">
     <button class="btn-cp" onclick="copyScreenshot()">Copy</button>
     <button class="btn-pr" onclick="downloadScreenshot()">Download</button>
-    <button class="btn-c" onclick="document.getElementById(&#39;ss-preview&#39;).style.display=&#39;none&#39;">Close</button>
+    <button class="btn-c" onclick="document.getElementById('ss-preview').style.display='none'">Close</button>
   </div>
 </div>
 
-<div class="loupe" id="loupe"><div id="loupe-inner" style="width:100%;height:100%"></div><div class="loupe-crosshair"></div><div class="loupe-label">3× Zoom</div></div>
-<div class="cd" id="coords">40.323449°N, 74.232495°W</div>
-<div id="map" class="leaflet-container leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="outline-style: none;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(0px, 0px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 22; transform: translate3d(275px, 247px, 0px) scale(0.5);"></div><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 23; transform: translate3d(84px, 156px, 0px) scale(1);"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(302px, 13px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(558px, 13px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(302px, 269px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(558px, 269px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(46px, 13px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(814px, 13px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(46px, 269px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(814px, 269px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(558px, -243px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(558px, 525px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(302px, -243px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(814px, -243px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(302px, 525px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(814px, 525px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1070px, 13px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1070px, 269px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(46px, -243px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1070px, -243px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(46px, 525px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1070px, 525px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-210px, 13px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1326px, 13px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-210px, 269px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1326px, 269px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-210px, -243px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1326px, -243px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-210px, 525px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1326px, 525px, 0px); opacity: 1;"></div></div><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 22; transform: translate3d(275px, 247px, 0px) scale(0.5);"></div><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 23; transform: translate3d(84px, 156px, 0px) scale(1);"><img alt="" src="./index_files/19252" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(302px, 13px, 0px); opacity: 1;"><img alt="" src="./index_files/19253" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(558px, 13px, 0px); opacity: 1;"><img alt="" src="./index_files/19252(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(302px, 269px, 0px); opacity: 1;"><img alt="" src="./index_files/19253(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(558px, 269px, 0px); opacity: 1;"><img alt="" src="./index_files/19251" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(46px, 13px, 0px); opacity: 1;"><img alt="" src="./index_files/19254" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(814px, 13px, 0px); opacity: 1;"><img alt="" src="./index_files/19251(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(46px, 269px, 0px); opacity: 1;"><img alt="" src="./index_files/19254(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(814px, 269px, 0px); opacity: 1;"><img alt="" src="./index_files/19253(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(558px, -243px, 0px); opacity: 1;"><img alt="" src="./index_files/19253(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(558px, 525px, 0px); opacity: 1;"><img alt="" src="./index_files/19252(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(302px, -243px, 0px); opacity: 1;"><img alt="" src="./index_files/19254(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(814px, -243px, 0px); opacity: 1;"><img alt="" src="./index_files/19252(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(302px, 525px, 0px); opacity: 1;"><img alt="" src="./index_files/19254(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(814px, 525px, 0px); opacity: 1;"><img alt="" src="./index_files/19255" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1070px, 13px, 0px); opacity: 1;"><img alt="" src="./index_files/19255(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1070px, 269px, 0px); opacity: 1;"><img alt="" src="./index_files/19251(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(46px, -243px, 0px); opacity: 1;"><img alt="" src="./index_files/19255(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1070px, -243px, 0px); opacity: 1;"><img alt="" src="./index_files/19251(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(46px, 525px, 0px); opacity: 1;"><img alt="" src="./index_files/19255(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1070px, 525px, 0px); opacity: 1;"><img alt="" src="./index_files/19250" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-210px, 13px, 0px); opacity: 1;"><img alt="" src="./index_files/19256" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1326px, 13px, 0px); opacity: 1;"><img alt="" src="./index_files/19250(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-210px, 269px, 0px); opacity: 1;"><img alt="" src="./index_files/19256(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1326px, 269px, 0px); opacity: 1;"><img alt="" src="./index_files/19250(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-210px, -243px, 0px); opacity: 1;"><img alt="" src="./index_files/19256(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1326px, -243px, 0px); opacity: 1;"><img alt="" src="./index_files/19250(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-210px, 525px, 0px); opacity: 1;"><img alt="" src="./index_files/19256(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(1326px, 525px, 0px); opacity: 1;"></div></div><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 22; transform: translate3d(275px, 247px, 0px) scale(0.5);"></div><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 23; transform: translate3d(84px, 156px, 0px) scale(1);"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(302px, 13px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(302px, 269px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(46px, 13px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(46px, 269px, 0px); opacity: 1;"></div></div></div><div class="leaflet-pane leaflet-overlay-pane"></div><div class="leaflet-pane leaflet-shadow-pane"></div><div class="leaflet-pane leaflet-marker-pane"></div><div class="leaflet-pane leaflet-tooltip-pane"></div><div class="leaflet-pane leaflet-popup-pane"></div><div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(4.92889e+06px, 6.3321e+06px, 0px) scale(32768);"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"></div><div class="leaflet-top leaflet-right"></div><div class="leaflet-bottom leaflet-left"></div><div class="leaflet-bottom leaflet-right"><div class="leaflet-control-scale leaflet-control"><div class="leaflet-control-scale-line" style="width: 110px;">200 m</div><div class="leaflet-control-scale-line" style="width: 84px;">500 ft</div></div><div class="leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="file:///C:/Users/jarek/Downloads/index_9.html#" title="Zoom in" role="button" aria-label="Zoom in" aria-disabled="false"><span aria-hidden="true">+</span></a><a class="leaflet-control-zoom-out" href="file:///C:/Users/jarek/Downloads/index_9.html#" title="Zoom out" role="button" aria-label="Zoom out" aria-disabled="false"><span aria-hidden="true">−</span></a></div><div class="leaflet-control-attribution leaflet-control">© Esri</div></div></div></div>
+<div class="loupe" id="loupe"><div id="loupe-inner" style="width:100%;height:100%"></div><div class="loupe-crosshair"></div><div class="loupe-label">3&#x00d7; Zoom</div></div>
+<div class="cd" id="coords">40.3186\u00b0N, 74.2439\u00b0W</div>
+<div id="map"></div>
 
 <script>
 // ============================================================
@@ -1151,7 +1151,6 @@ function printMap(){
 // KEYBOARD
 // ============================================================
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(currentTool)deactivateTool();if(loupeActive){loupeActive=false;document.getElementById('tool-loupe').classList.remove('active');document.getElementById('loupe').style.display='none';destroyLoupeMap()}document.getElementById('ni').style.display='none';document.getElementById('pen-opts').style.display='none';document.getElementById('ss-preview').style.display='none';drawCanvas.classList.remove('active');hideReport();doneBtn.style.display='none'}});
-</script><div style="display: none; position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%); background: rgb(244, 180, 0); color: rgb(10, 10, 10); font-weight: 700; font-size: 14px; padding: 10px 28px; border-radius: 8px; z-index: 1001; cursor: pointer; box-shadow: rgba(0, 0, 0, 0.4) 0px 4px 16px; -webkit-tap-highlight-color: transparent;">Done ✓</div>
-
-
-</body></html>
+</script>
+</body>
+</html>
