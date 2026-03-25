@@ -1,592 +1,244 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
+<!-- saved from url=(0045)file:///C:/Users/jarek/Downloads/index_8.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>SKYNEX Media — Site Viewer</title>
-
-<!-- Leaflet 1.9 -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- Leaflet Side-by-Side -->
-<script src="https://unpkg.com/leaflet-side-by-side@2.0.0/index.js"></script>
-
+<link rel="stylesheet" href="./index_files/leaflet.css">
+<script src="./index_files/leaflet.js.download"></script>
+<script src="./index_files/index.js.download"></script>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: #0a0a0a;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    color: #e0e0e0;
-    overflow: hidden;
-    height: 100vh;
-    width: 100vw;
-  }
-
-  #map {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #0a0a0a;
-    z-index: 1;
-  }
-
-  /* === SKYNEX BRAND BAR === */
-  .brand-bar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 44px;
-    background: linear-gradient(180deg, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.85) 100%);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-bottom: 1px solid rgba(244,180,0,0.25);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 16px;
-    z-index: 1000;
-  }
-
-  .brand-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .brand-logo {
-    width: 20px;
-    height: 20px;
-    background: #F4B400;
-    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
-    flex-shrink: 0;
-  }
-
-  .brand-name {
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 2.5px;
-    color: #F4B400;
-    text-transform: uppercase;
-  }
-
-  .brand-sep {
-    width: 1px;
-    height: 18px;
-    background: rgba(244,180,0,0.3);
-  }
-
-  .brand-project {
-    font-size: 11px;
-    font-weight: 400;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 0.5px;
-  }
-
-  .brand-badge {
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: rgba(244,180,0,0.6);
-    background: rgba(244,180,0,0.08);
-    border: 1px solid rgba(244,180,0,0.15);
-    padding: 3px 8px;
-    border-radius: 3px;
-  }
-
-  /* === TOOLBAR === */
-  .toolbar {
-    position: absolute;
-    top: 56px;
-    left: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    z-index: 1000;
-  }
-
-  .tool-btn {
-    width: 36px;
-    height: 36px;
-    background: rgba(10,10,10,0.9);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: rgba(255,255,255,0.7);
-    font-size: 15px;
-    transition: all 0.15s ease;
-    user-select: none;
-    position: relative;
-  }
-
-  .tool-btn:hover {
-    background: rgba(30,30,30,0.95);
-    color: #F4B400;
-  }
-
-  .tool-btn.active {
-    background: rgba(244,180,0,0.15);
-    border-color: rgba(244,180,0,0.4);
-    color: #F4B400;
-  }
-
-  .tool-btn svg {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
-    stroke: currentColor;
-    stroke-width: 0;
-  }
-
-  .tool-btn .tool-tip {
-    display: none;
-    position: absolute;
-    left: 42px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(10,10,10,0.95);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 11px;
-    color: rgba(255,255,255,0.7);
-    white-space: nowrap;
-    pointer-events: none;
-  }
-
-  .tool-btn:hover .tool-tip {
-    display: block;
-  }
-
-  .tool-divider {
-    height: 1px;
-    width: 36px;
-    background: rgba(255,255,255,0.06);
-    margin: 4px 0;
-  }
-
-  /* === LAYER PANEL === */
-  .layer-panel {
-    position: absolute;
-    top: 56px;
-    right: 12px;
-    background: rgba(10,10,10,0.92);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 6px;
-    padding: 12px 14px;
-    z-index: 1000;
-    min-width: 190px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }
-
-  .layer-title {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: rgba(244,180,0,0.7);
-    margin-bottom: 10px;
-  }
-
-  .layer-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 0;
-    cursor: pointer;
-    user-select: none;
-  }
-
-  .layer-item:hover .layer-label {
-    color: #fff;
-  }
-
-  .layer-check {
-    width: 14px;
-    height: 14px;
-    border-radius: 3px;
-    border: 1.5px solid rgba(255,255,255,0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.15s ease;
-  }
-
-  .layer-check.active {
-    background: #F4B400;
-    border-color: #F4B400;
-  }
-
-  .layer-check.active::after {
-    content: '';
-    width: 6px;
-    height: 6px;
-    background: #0a0a0a;
-    border-radius: 1px;
-  }
-
-  .layer-label {
-    font-size: 12px;
-    color: rgba(255,255,255,0.65);
-    transition: color 0.15s ease;
-  }
-
-  .layer-tag {
-    font-size: 9px;
-    color: rgba(255,255,255,0.3);
-    margin-left: auto;
-    font-style: italic;
-  }
-
-  .layer-divider {
-    height: 1px;
-    background: rgba(255,255,255,0.06);
-    margin: 6px 0;
-  }
-
-  /* === OPACITY SLIDER === */
-  .opacity-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 0 2px 0;
-  }
-
-  .opacity-label {
-    font-size: 10px;
-    color: rgba(255,255,255,0.4);
-    min-width: 48px;
-  }
-
-  .opacity-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 3px;
-    border-radius: 2px;
-    background: rgba(255,255,255,0.12);
-    outline: none;
-  }
-
-  .opacity-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #F4B400;
-    cursor: pointer;
-  }
-
-  .opacity-val {
-    font-size: 10px;
-    color: rgba(255,255,255,0.4);
-    min-width: 28px;
-    text-align: right;
-  }
-
-  /* === MEASUREMENT RESULTS === */
-  .measure-result {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(10,10,10,0.92);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(244,180,0,0.3);
-    border-radius: 6px;
-    padding: 10px 18px;
-    z-index: 1000;
-    display: none;
-    text-align: center;
-    min-width: 200px;
-  }
-
-  .measure-result .result-value {
-    font-size: 20px;
-    font-weight: 700;
-    color: #F4B400;
-    font-family: 'Consolas', 'SF Mono', monospace;
-  }
-
-  .measure-result .result-label {
-    font-size: 10px;
-    color: rgba(255,255,255,0.5);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 2px;
-  }
-
-  .measure-result .result-close {
-    position: absolute;
-    top: 4px;
-    right: 8px;
-    cursor: pointer;
-    color: rgba(255,255,255,0.3);
-    font-size: 14px;
-  }
-
-  .measure-result .result-close:hover {
-    color: #fff;
-  }
-
-  /* === COMPARE MODE === */
-  .compare-labels {
-    display: none;
-    z-index: 999;
-  }
-
-  .compare-label {
-    position: absolute;
-    top: 52px;
-    background: rgba(10,10,10,0.85);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 4px;
-    padding: 5px 10px;
-    z-index: 999;
-  }
-
-  .compare-label-left {
-    left: 12px;
-  }
-
-  .compare-label-right {
-    right: 12px;
-  }
-
-  .compare-date {
-    font-size: 12px;
-    font-weight: 600;
-    color: #F4B400;
-  }
-
-  .compare-sublabel {
-    font-size: 9px;
-    color: rgba(255,255,255,0.4);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  /* === DATE STAMP === */
-  .date-stamp {
-    position: absolute;
-    top: 52px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(10,10,10,0.8);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 4px;
-    padding: 4px 12px;
-    z-index: 998;
-    text-align: center;
-  }
-
-  .date-stamp-text {
-    font-size: 11px;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 0.3px;
-  }
-
-  .date-stamp-text strong {
-    color: rgba(244,180,0,0.8);
-    font-weight: 600;
-  }
-
-  /* === COORDINATES DISPLAY === */
-  .coord-display {
-    position: absolute;
-    bottom: 8px;
-    left: 12px;
-    background: rgba(10,10,10,0.85);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 4px;
-    padding: 5px 10px;
-    font-size: 11px;
-    font-family: 'Consolas', 'SF Mono', monospace;
-    color: rgba(255,255,255,0.45);
-    z-index: 1000;
-    letter-spacing: 0.3px;
-  }
-
-  /* === INSTRUCTIONS TOAST === */
-  .toast {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(10,10,10,0.92);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(244,180,0,0.2);
-    border-radius: 6px;
-    padding: 8px 16px;
-    z-index: 1001;
-    font-size: 12px;
-    color: rgba(255,255,255,0.7);
-    display: none;
-    white-space: nowrap;
-  }
-
-  .toast .toast-key {
-    color: #F4B400;
-    font-weight: 600;
-  }
-
-  /* === ZOOM CONTROL OVERRIDES === */
-  .leaflet-control-zoom a {
-    background: rgba(10,10,10,0.9) !important;
-    color: rgba(255,255,255,0.7) !important;
-    border-color: rgba(255,255,255,0.1) !important;
-    width: 36px !important;
-    height: 36px !important;
-    line-height: 36px !important;
-    font-size: 16px !important;
-  }
-
-  .leaflet-control-zoom a:hover {
-    background: rgba(30,30,30,0.95) !important;
-    color: #F4B400 !important;
-  }
-
-  .leaflet-control-zoom {
-    border: 1px solid rgba(255,255,255,0.1) !important;
-    border-radius: 5px !important;
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.4) !important;
-    margin-top: 0 !important;
-  }
-
-  /* === SCALE BAR === */
-  .leaflet-control-scale-line {
-    background: rgba(10,10,10,0.8) !important;
-    color: rgba(255,255,255,0.6) !important;
-    border-color: rgba(255,255,255,0.3) !important;
-    font-size: 10px !important;
-    padding: 2px 6px !important;
-  }
-
-  /* === ATTRIBUTION === */
-  .leaflet-control-attribution {
-    background: rgba(10,10,10,0.7) !important;
-    color: rgba(255,255,255,0.3) !important;
-    font-size: 9px !important;
-  }
-
-  .leaflet-control-attribution a {
-    color: rgba(244,180,0,0.5) !important;
-  }
-
-  /* === SIDE BY SIDE SLIDER === */
-  .leaflet-sbs-range {
-    -webkit-appearance: none;
-    appearance: none;
-    background: transparent;
-    height: 100%;
-    cursor: col-resize;
-  }
-
-  .leaflet-sbs-divider {
-    background: #F4B400 !important;
-    width: 3px !important;
-  }
-
-  .leaflet-sbs-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #F4B400;
-    border: 3px solid #0a0a0a;
-    cursor: col-resize;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-  }
-
-  /* === ANNOTATION POPUP === */
-  .leaflet-popup-content-wrapper {
-    background: rgba(10,10,10,0.92) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-    border-radius: 6px !important;
-    color: #e0e0e0 !important;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
-  }
-
-  .leaflet-popup-tip {
-    background: rgba(10,10,10,0.92) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-  }
-
-  .leaflet-popup-content {
-    margin: 10px 14px !important;
-    font-size: 12px !important;
-  }
-
-  .pin-popup-title {
-    color: #F4B400;
-    font-weight: 600;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-  }
-
-  .pin-popup-coords {
-    font-family: 'Consolas', 'SF Mono', monospace;
-    font-size: 11px;
-    color: rgba(255,255,255,0.5);
-  }
-
-  /* Measurement line/polygon styles */
-  .measure-vertex {
-    width: 10px !important;
-    height: 10px !important;
-    margin-left: -5px !important;
-    margin-top: -5px !important;
-    background: #F4B400 !important;
-    border: 2px solid #0a0a0a !important;
-    border-radius: 50% !important;
-  }
-
-  /* === MOBILE === */
-  @media (max-width: 600px) {
-    .brand-bar { height: 38px; padding: 0 10px; }
-    .brand-name { font-size: 11px; letter-spacing: 2px; }
-    .brand-project { display: none; }
-    .brand-sep { display: none; }
-    .brand-badge { font-size: 8px; padding: 2px 6px; }
-    .toolbar { top: 48px; left: 8px; }
-    .tool-btn { width: 32px; height: 32px; }
-    .tool-btn svg { width: 16px; height: 16px; }
-    .layer-panel { top: 48px; right: 8px; min-width: 160px; padding: 10px 12px; }
-    .coord-display { font-size: 10px; bottom: 6px; left: 8px; }
-    .date-stamp { top: 44px; padding: 3px 8px; }
-    .date-stamp-text { font-size: 10px; }
-    .measure-result { bottom: 35px; min-width: 160px; padding: 8px 14px; }
-    .measure-result .result-value { font-size: 16px; }
-    .toast { bottom: 35px; font-size: 11px; padding: 6px 12px; }
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#e0e0e0;overflow:hidden;height:100vh;height:100dvh;width:100vw;-webkit-tap-highlight-color:transparent}
+#map{position:absolute;top:0;left:0;right:0;bottom:0;background:#0a0a0a;z-index:1}
+
+/* ===== BRAND BAR ===== */
+.brand-bar{position:absolute;top:0;left:0;right:0;height:44px;background:linear-gradient(180deg,rgba(10,10,10,.95),rgba(10,10,10,.85));backdrop-filter:blur(8px);border-bottom:1px solid rgba(244,180,0,.25);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:1000}
+.brand-left{display:flex;align-items:center;gap:10px}
+.brand-logo{width:20px;height:20px;background:#F4B400;clip-path:polygon(50% 0%,100% 100%,0% 100%);flex-shrink:0}
+.brand-name{font-size:13px;font-weight:700;letter-spacing:2.5px;color:#F4B400;text-transform:uppercase}
+.brand-sep{width:1px;height:18px;background:rgba(244,180,0,.3)}
+.brand-project{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.5px}
+.brand-badge{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(244,180,0,.6);background:rgba(244,180,0,.08);border:1px solid rgba(244,180,0,.15);padding:3px 8px;border-radius:3px}
+
+/* ===== TOOLBAR ===== */
+.toolbar{position:absolute;top:56px;left:12px;display:flex;flex-direction:column;gap:2px;z-index:1000}
+.tool-btn{width:38px;height:38px;background:rgba(10,10,10,.9);border:1px solid rgba(255,255,255,.1);border-radius:5px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.7);transition:all .15s ease;user-select:none;position:relative;-webkit-tap-highlight-color:transparent}
+.tool-btn:hover{background:rgba(30,30,30,.95);color:#F4B400}
+.tool-btn.active{background:rgba(244,180,0,.15);border-color:rgba(244,180,0,.4);color:#F4B400}
+.tool-btn svg{width:18px;height:18px}
+.tool-btn .tt{display:none;position:absolute;left:44px;top:50%;transform:translateY(-50%);background:rgba(10,10,10,.95);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:4px 10px;font-size:11px;color:rgba(255,255,255,.7);white-space:nowrap;pointer-events:none;z-index:1010}
+.tool-btn:hover .tt{display:block}
+.tool-div{height:1px;width:38px;background:rgba(255,255,255,.06);margin:3px 0}
+
+/* ===== MOBILE TOGGLES ===== */
+.mob-toggle{display:none;position:absolute;top:52px;left:8px;width:42px;height:42px;background:rgba(10,10,10,.92);border:1px solid rgba(244,180,0,.3);border-radius:8px;z-index:1001;cursor:pointer;align-items:center;justify-content:center;color:#F4B400;-webkit-tap-highlight-color:transparent}
+.mob-toggle svg{width:22px;height:22px}
+.mob-toggle.open{background:rgba(244,180,0,.15)}
+.mob-layer-toggle{display:none;position:absolute;top:52px;right:8px;width:42px;height:42px;background:rgba(10,10,10,.92);border:1px solid rgba(255,255,255,.12);border-radius:8px;z-index:1001;cursor:pointer;align-items:center;justify-content:center;color:rgba(255,255,255,.7);-webkit-tap-highlight-color:transparent}
+.mob-layer-toggle.open{background:rgba(244,180,0,.15);color:#F4B400;border-color:rgba(244,180,0,.3)}
+
+/* ===== LAYER PANEL ===== */
+.layer-panel{position:absolute;top:56px;right:12px;background:rgba(10,10,10,.92);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:12px 14px;z-index:1000;min-width:210px;box-shadow:0 4px 20px rgba(0,0,0,.5);max-height:calc(100vh - 70px);max-height:calc(100dvh - 70px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.lt{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(244,180,0,.7);margin-bottom:10px}
+.li{display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.li:hover .ll{color:#fff}
+.lc{width:14px;height:14px;border-radius:3px;border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s ease}
+.lc.active{background:#F4B400;border-color:#F4B400}
+.lc.active::after{content:'';width:6px;height:6px;background:#0a0a0a;border-radius:1px}
+.ll{font-size:12px;color:rgba(255,255,255,.65);transition:color .15s ease}
+.ltag{font-size:9px;color:rgba(255,255,255,.3);margin-left:auto;font-style:italic}
+.ld{height:1px;background:rgba(255,255,255,.06);margin:6px 0}
+
+/* Opacity rows */
+.orow{display:flex;align-items:center;gap:8px;padding:4px 0 2px;margin-top:2px}
+.olbl{font-size:10px;color:rgba(255,255,255,.4);min-width:52px;flex-shrink:0}
+.oslider{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,.12);outline:none}
+.oslider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:#F4B400;cursor:pointer}
+.oval{font-size:10px;color:rgba(255,255,255,.4);min-width:28px;text-align:right}
+
+/* Date select */
+.date-select-wrap{margin-top:6px}
+.date-select-label{font-size:10px;color:rgba(255,255,255,.35);margin-bottom:4px}
+.date-select{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:4px;color:#e0e0e0;padding:5px 8px;font-size:12px;font-family:inherit;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none}
+.date-select:focus{border-color:rgba(244,180,0,.4)}
+.date-select option{background:#1a1a1a;color:#e0e0e0}
+
+/* ===== MAP LABELS ===== */
+.ml{background:rgba(10,10,10,.88);border:1px solid rgba(244,180,0,.4);border-radius:4px;padding:2px 7px;font-size:11px;font-weight:600;color:#F4B400;font-family:Consolas,'SF Mono',monospace;white-space:nowrap}
+.ml-total{background:rgba(244,180,0,.15);border:1px solid rgba(244,180,0,.5);border-radius:4px;padding:3px 9px;font-size:13px;font-weight:700;color:#F4B400;font-family:Consolas,'SF Mono',monospace;white-space:nowrap}
+.ml-area{background:rgba(10,10,10,.88);border:1px solid rgba(244,180,0,.4);border-radius:4px;padding:4px 10px;font-size:12px;font-weight:600;color:#F4B400;font-family:Consolas,'SF Mono',monospace;white-space:nowrap;text-align:center;line-height:1.4}
+.ml-circle{background:rgba(10,10,10,.88);border:1px solid rgba(244,180,0,.4);border-radius:4px;padding:4px 10px;font-size:11px;font-weight:600;color:#F4B400;font-family:Consolas,'SF Mono',monospace;white-space:nowrap;text-align:center;line-height:1.5}
+.ml-note{background:rgba(10,10,10,.9);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:6px 10px;font-size:12px;color:#e0e0e0;max-width:200px;word-wrap:break-word;line-height:1.3}
+.ml-note .nt{font-size:10px;font-weight:600;color:#F4B400;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+
+/* ===== PEN TOOL OPTIONS ===== */
+.pen-opts{display:none;position:absolute;top:56px;left:54px;background:rgba(10,10,10,.92);backdrop-filter:blur(8px);border:1px solid rgba(244,180,0,.25);border-radius:6px;padding:10px 12px;z-index:1000;min-width:140px;box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.pen-opts-title{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(244,180,0,.6);margin-bottom:8px}
+.pen-colors{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.pen-color{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s}
+.pen-color.active{border-color:#fff}
+.pen-color:hover{border-color:rgba(255,255,255,.5)}
+.pen-width-row{display:flex;align-items:center;gap:6px}
+.pen-width-row label{font-size:10px;color:rgba(255,255,255,.4);min-width:36px}
+.pen-width-row input{-webkit-appearance:none;appearance:none;width:80px;height:4px;border-radius:2px;background:rgba(255,255,255,.12);outline:none}
+.pen-width-row input::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#F4B400;cursor:pointer}
+.pen-width-row span{font-size:10px;color:rgba(255,255,255,.4);min-width:20px;text-align:right}
+
+/* ===== DRAW CANVAS OVERLAY ===== */
+.draw-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:500;pointer-events:none;touch-action:none}
+.draw-canvas.active{pointer-events:auto;cursor:crosshair}
+
+/* ===== SCREENSHOT FLASH ===== */
+.screenshot-flash{position:absolute;top:0;left:0;right:0;bottom:0;background:#fff;z-index:2000;opacity:0;pointer-events:none;transition:opacity .15s}
+.screenshot-flash.flash{opacity:.6}
+
+/* ===== SCREENSHOT PREVIEW ===== */
+.screenshot-preview{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(10,10,10,.96);backdrop-filter:blur(12px);border:1px solid rgba(244,180,0,.3);border-radius:8px;padding:16px;z-index:1100;max-width:92vw;max-height:85vh;max-height:85dvh;text-align:center}
+.screenshot-preview img{max-width:100%;max-height:60vh;border-radius:4px;border:1px solid rgba(255,255,255,.1)}
+.screenshot-preview .sp-title{font-size:12px;color:#F4B400;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.screenshot-preview .sp-actions{display:flex;gap:8px;margin-top:12px;justify-content:center}
+.screenshot-preview .sp-actions button{padding:8px 20px;border-radius:4px;border:none;cursor:pointer;font-size:12px;font-weight:600;-webkit-tap-highlight-color:transparent}
+.screenshot-preview .sp-close{position:absolute;top:8px;right:12px;cursor:pointer;color:rgba(255,255,255,.3);font-size:20px;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+.screenshot-preview .sp-close:hover{color:#fff}
+
+/* ===== CAD MULTI-LAYER ===== */
+.cad-header{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cad-arrow{font-size:10px;color:rgba(244,180,0,.5);transition:transform .2s ease;display:inline-block}
+.cad-arrow.open{transform:rotate(90deg)}
+.cad-body{padding-top:6px}
+.cad-layer-item{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.cad-layer-item:hover .cad-layer-name{color:#fff}
+.cad-color-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,.15)}
+.cad-layer-name{font-size:11px;color:rgba(255,255,255,.6);transition:color .15s ease;flex:1}
+.cad-layer-check{width:14px;height:14px;border-radius:3px;border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s ease}
+.cad-layer-check.active{background:#F4B400;border-color:#F4B400}
+.cad-layer-check.active::after{content:'';width:6px;height:6px;background:#0a0a0a;border-radius:1px}
+.cad-opacity-row{display:flex;align-items:center;gap:6px;padding:2px 0 4px 18px}
+.cad-opacity-row .oslider{height:3px}
+.cad-opacity-row .oval{font-size:9px;min-width:24px}
+
+/* ===== DATE STAMP ===== */
+.ds{position:absolute;top:52px;left:50%;transform:translateX(-50%);background:rgba(10,10,10,.8);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:4px 12px;z-index:998;text-align:center}
+.ds-t{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.3px}
+.ds-t strong{color:rgba(244,180,0,.8);font-weight:600}
+
+/* ===== COMPARE ===== */
+.cl{display:none;z-index:999}
+.cl-l{position:absolute;top:52px;background:rgba(10,10,10,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:5px 10px;z-index:999}
+.cl-left{left:56px}.cl-right{right:12px}
+.cl-date{font-size:12px;font-weight:600;color:#F4B400}
+.cl-sub{font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px}
+
+/* Compare date selectors */
+.compare-selectors{display:none;position:absolute;top:52px;left:50%;transform:translateX(-50%);background:rgba(10,10,10,.9);backdrop-filter:blur(8px);border:1px solid rgba(244,180,0,.2);border-radius:6px;padding:8px 12px;z-index:1000;white-space:nowrap}
+.compare-selectors label{font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;margin-right:4px}
+.compare-selectors select{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:3px;color:#F4B400;padding:3px 6px;font-size:11px;font-family:inherit;outline:none;margin-right:10px;cursor:pointer}
+.compare-selectors select option{background:#1a1a1a;color:#e0e0e0}
+.compare-vs{color:rgba(255,255,255,.25);font-size:11px;margin:0 6px}
+
+/* ===== COORD DISPLAY ===== */
+.cd{position:absolute;bottom:8px;left:12px;background:rgba(10,10,10,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.06);border-radius:4px;padding:5px 10px;font-size:11px;font-family:Consolas,'SF Mono',monospace;color:rgba(255,255,255,.45);z-index:1000;letter-spacing:.3px}
+
+/* ===== TOAST ===== */
+.toast{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);background:rgba(10,10,10,.92);backdrop-filter:blur(8px);border:1px solid rgba(244,180,0,.2);border-radius:6px;padding:8px 16px;z-index:1001;font-size:12px;color:rgba(255,255,255,.7);display:none;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.toast b{color:#F4B400;font-weight:600}
+
+/* ===== NOTE INPUT ===== */
+.ni-wrap{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);background:rgba(10,10,10,.95);backdrop-filter:blur(8px);border:1px solid rgba(244,180,0,.3);border-radius:6px;padding:12px 16px;z-index:1002;display:none;width:280px;max-width:90vw}
+.ni-wrap label{font-size:10px;color:rgba(244,180,0,.7);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px}
+.ni-wrap input,.ni-wrap textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:4px;color:#e0e0e0;padding:8px 10px;font-size:14px;font-family:inherit;outline:none;margin-bottom:8px;resize:vertical}
+.ni-wrap input:focus,.ni-wrap textarea:focus{border-color:rgba(244,180,0,.4)}
+.ni-btns{display:flex;gap:8px;justify-content:flex-end}
+.ni-btns button{padding:8px 18px;border-radius:4px;border:none;cursor:pointer;font-size:12px;font-weight:600;-webkit-tap-highlight-color:transparent}
+.btn-c{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
+.btn-s{background:#F4B400;color:#0a0a0a}
+
+/* ===== REPORT ===== */
+.rp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(10,10,10,.96);backdrop-filter:blur(12px);border:1px solid rgba(244,180,0,.3);border-radius:8px;padding:20px 24px;z-index:1100;display:none;width:400px;max-width:92vw;max-height:80vh;max-height:80dvh;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.rp h3{color:#F4B400;font-size:14px;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.rp .rs{font-size:11px;color:rgba(255,255,255,.4);margin-bottom:16px}
+.rp-sec{margin-bottom:14px}
+.rp-st{font-size:10px;color:rgba(244,180,0,.6);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:4px}
+.rp-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}
+.rp-row .rk{color:rgba(255,255,255,.5)}
+.rp-row .rv{color:#e0e0e0;font-family:Consolas,monospace;word-break:break-word}
+.rp-close{position:absolute;top:12px;right:14px;cursor:pointer;color:rgba(255,255,255,.3);font-size:22px;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+.rp-close:hover{color:#fff}
+.rp-acts{display:flex;gap:8px;margin-top:16px}
+.rp-acts button{flex:1;padding:10px;border-radius:4px;border:none;cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;-webkit-tap-highlight-color:transparent}
+.btn-pr{background:#F4B400;color:#0a0a0a}
+.btn-cp{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7)}
+
+/* ===== LOUPE ===== */
+.loupe{display:none;position:absolute;width:180px;height:180px;border-radius:50%;border:3px solid #F4B400;box-shadow:0 0 0 1px rgba(0,0,0,.5),0 4px 20px rgba(0,0,0,.6);overflow:hidden;pointer-events:none;z-index:1002}
+.loupe-crosshair{position:absolute;top:50%;left:50%;width:12px;height:12px;transform:translate(-50%,-50%);z-index:2}
+.loupe-crosshair::before,.loupe-crosshair::after{content:'';position:absolute;background:rgba(244,180,0,.6)}
+.loupe-crosshair::before{width:1px;height:12px;left:50%;top:0;transform:translateX(-50%)}
+.loupe-crosshair::after{width:12px;height:1px;top:50%;left:0;transform:translateY(-50%)}
+.loupe-label{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:9px;color:rgba(244,180,0,.7);font-weight:600;letter-spacing:1px;white-space:nowrap;text-transform:uppercase}
+
+/* ===== LEAFLET OVERRIDES ===== */
+.leaflet-control-zoom a{background:rgba(10,10,10,.9)!important;color:rgba(255,255,255,.7)!important;border-color:rgba(255,255,255,.1)!important;width:36px!important;height:36px!important;line-height:36px!important;font-size:16px!important}
+.leaflet-control-zoom a:hover{background:rgba(30,30,30,.95)!important;color:#F4B400!important}
+.leaflet-control-zoom{border:1px solid rgba(255,255,255,.1)!important;border-radius:5px!important;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.4)!important}
+.leaflet-control-scale-line{background:rgba(10,10,10,.8)!important;color:rgba(255,255,255,.6)!important;border-color:rgba(255,255,255,.3)!important;font-size:10px!important}
+.leaflet-control-attribution{background:rgba(10,10,10,.85)!important;color:rgba(255,255,255,.25)!important;font-size:9px!important;border:none!important;padding:2px 6px!important}
+.leaflet-control-attribution a{color:rgba(255,255,255,.3)!important;text-decoration:none!important}
+.leaflet-control-attribution svg{display:none!important}
+.leaflet-sbs-divider{background:#F4B400!important;width:3px!important}
+.leaflet-sbs-range::-webkit-slider-thumb{-webkit-appearance:none;width:40px;height:40px;border-radius:50%;background:#F4B400;border:3px solid #0a0a0a;cursor:col-resize;box-shadow:0 2px 8px rgba(0,0,0,.5)}
+.leaflet-popup-content-wrapper{background:rgba(10,10,10,.92)!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:6px!important;color:#e0e0e0!important}
+.leaflet-popup-tip{background:rgba(10,10,10,.92)!important}
+.leaflet-popup-content{margin:10px 14px!important;font-size:12px!important}
+
+/* ===== MOBILE ===== */
+@media(max-width:768px){
+.brand-bar{height:40px;padding:0 10px}
+.brand-name{font-size:11px;letter-spacing:2px}
+.brand-project,.brand-sep{display:none}
+.brand-badge{font-size:8px;padding:2px 6px}
+.toolbar{display:none;top:100px;left:8px;gap:3px}
+.toolbar.mob-open{display:flex}
+.tool-btn{width:42px;height:42px}
+.tool-btn svg{width:20px;height:20px}
+.tool-btn .tt{display:none!important}
+.tool-div{width:42px}
+.mob-toggle{display:flex}
+.layer-panel{display:none;top:100px;right:8px;padding:10px 12px;min-width:180px}
+.layer-panel.mob-open{display:block}
+.mob-layer-toggle{display:flex}
+.li{padding:8px 0}
+.lc{width:18px;height:18px}
+.lc.active::after{width:8px;height:8px}
+.ll{font-size:13px}
+.oslider{height:8px}
+.oslider::-webkit-slider-thumb{width:22px;height:22px}
+.ds{top:46px;padding:3px 8px}
+.ds-t{font-size:10px}
+.cd{font-size:10px;bottom:6px;left:6px;padding:4px 8px}
+.toast{bottom:14px;font-size:11px;padding:6px 12px}
+.ni-wrap{bottom:20px;width:88vw}
+.rp{width:92vw;padding:16px 18px;max-height:85dvh}
+.cl-left{left:8px;top:46px}
+.cl-right{right:8px;top:46px}
+.compare-selectors{top:46px;padding:6px 8px;width:90vw;white-space:normal;text-align:center}
+.compare-selectors select{margin-bottom:4px}
+.leaflet-control-zoom a{width:40px!important;height:40px!important;line-height:40px!important;font-size:18px!important}
+.pen-opts{left:50px;top:auto;bottom:20px}
+.screenshot-preview{padding:12px;max-width:95vw}
+}
+@media(max-width:380px){
+.brand-name{font-size:10px;letter-spacing:1.5px}
+.brand-badge{display:none}
+.tool-btn{width:38px;height:38px}
+.tool-btn svg{width:18px;height:18px}
+.mob-toggle,.mob-layer-toggle{width:38px;height:38px}
+}
 </style>
 </head>
 <body>
 
-<!-- BRAND BAR -->
 <div class="brand-bar">
   <div class="brand-left">
     <div class="brand-logo"></div>
@@ -597,486 +249,909 @@
   <span class="brand-badge">Interactive Viewer</span>
 </div>
 
+<div class="mob-toggle" id="mob-toggle" onclick="toggleMobToolbar()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line></svg>
+</div>
+<div class="mob-layer-toggle" id="mob-layer-toggle" onclick="toggleMobLayers()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 22,8.5 12,15 2,8.5"></polygon><polyline points="2,15.5 12,22 22,15.5"></polyline></svg>
+</div>
+
 <!-- TOOLBAR -->
 <div class="toolbar" id="toolbar">
-  <!-- Distance -->
-  <div class="tool-btn" id="tool-distance" onclick="activateTool('distance')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="20" x2="20" y2="4"/><polyline points="14,4 20,4 20,10" fill="none"/><circle cx="4" cy="20" r="2" fill="currentColor" stroke="none"/></svg>
-    <span class="tool-tip">Measure Distance</span>
-  </div>
-
-  <!-- Area -->
-  <div class="tool-btn" id="tool-area" onclick="activateTool('area')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3,18 9,3 21,6 18,21" fill="rgba(244,180,0,0.15)"/></svg>
-    <span class="tool-tip">Measure Area</span>
-  </div>
-
-  <!-- Drop Pin -->
-  <div class="tool-btn" id="tool-pin" onclick="activateTool('pin')">
-    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
-    <span class="tool-tip">Drop Pin</span>
-  </div>
-
-  <div class="tool-divider"></div>
-
-  <!-- Compare -->
-  <div class="tool-btn" id="tool-compare" onclick="toggleCompare()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="8,7 12,3 16,7" fill="none"/><polyline points="8,17 12,21 16,17" fill="none"/><rect x="2" y="6" width="8" height="12" rx="1" fill="rgba(244,180,0,0.1)" stroke="currentColor"/><rect x="14" y="6" width="8" height="12" rx="1" fill="rgba(255,255,255,0.05)" stroke="currentColor"/></svg>
-    <span class="tool-tip">Compare Mode</span>
-  </div>
-
-  <div class="tool-divider"></div>
-
-  <!-- Clear All -->
-  <div class="tool-btn" id="tool-clear" onclick="clearAll()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    <span class="tool-tip">Clear All</span>
-  </div>
+  <div class="tool-btn" id="tool-single" onclick="activateTool(&#39;single&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="19" x2="19" y2="5"></line><circle cx="5" cy="19" r="2.5" fill="currentColor" stroke="none"></circle><circle cx="19" cy="5" r="2.5" fill="currentColor" stroke="none"></circle></svg><span class="tt">Distance (A\u2192B)</span></div>
+  <div class="tool-btn" id="tool-chain" onclick="activateTool(&#39;chain&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,20 9,8 15,16 21,4"></polyline><circle cx="3" cy="20" r="2" fill="currentColor" stroke="none"></circle><circle cx="9" cy="8" r="2" fill="currentColor" stroke="none"></circle><circle cx="15" cy="16" r="2" fill="currentColor" stroke="none"></circle><circle cx="21" cy="4" r="2" fill="currentColor" stroke="none"></circle></svg><span class="tt">Chain Distance</span></div>
+  <div class="tool-btn" id="tool-area" onclick="activateTool(&#39;area&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3,18 9,3 21,6 18,21" fill="rgba(244,180,0,.12)"></polygon></svg><span class="tt">Measure Area</span></div>
+  <div class="tool-btn" id="tool-circle" onclick="activateTool(&#39;circle&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="3,2"></line><circle cx="3" cy="12" r="1.5" fill="currentColor" stroke="none"></circle><circle cx="21" cy="12" r="1.5" fill="currentColor" stroke="none"></circle></svg><span class="tt">Diameter / Radius</span></div>
+  <div class="tool-btn" id="tool-rect" onclick="activateTool(&#39;rect&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1" fill="rgba(244,180,0,.1)"></rect></svg><span class="tt">Rectangle Area</span></div>
+  <div class="tool-div"></div>
+  <div class="tool-btn" id="tool-pin" onclick="activateTool(&#39;pin&#39;)"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"></path></svg><span class="tt">Drop Pin</span></div>
+  <div class="tool-btn" id="tool-note" onclick="activateTool(&#39;note&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg><span class="tt">Add Note</span></div>
+  <div class="tool-div"></div>
+  <div class="tool-btn" id="tool-loupe" onclick="toggleLoupe()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="7"></circle><line x1="15" y1="15" x2="21" y2="21"></line></svg><span class="tt">Magnifier</span></div>
+  <div class="tool-btn" id="tool-compare" onclick="toggleCompare()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"></line><rect x="2" y="5" width="8" height="14" rx="1" fill="rgba(244,180,0,.1)"></rect><rect x="14" y="5" width="8" height="14" rx="1" fill="rgba(255,255,255,.05)"></rect></svg><span class="tt">Compare Mode</span></div>
+  <div class="tool-btn" id="tool-report" onclick="showReport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path><polyline points="14,2 14,8 20,8"></polyline><line x1="12" y1="12" x2="12" y2="18"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg><span class="tt">Export Report</span></div>
+  <div class="tool-div"></div>
+  <!-- Pen / Freehand Draw -->
+  <div class="tool-btn" id="tool-pen" onclick="activateTool(&#39;pen&#39;)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg><span class="tt">Freehand Draw</span></div>
+  <!-- Screenshot -->
+  <div class="tool-btn" id="tool-screenshot" onclick="takeScreenshot()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="12" cy="12" r="3"></circle><path d="M3 7l2-2h3"></path><path d="M19 7l-2-2h-3"></path></svg><span class="tt">Screenshot</span></div>
+  <!-- Print -->
+  <div class="tool-btn" id="tool-print" onclick="printMap()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"></polyline><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg><span class="tt">Print Map</span></div>
+  <div class="tool-div"></div>
+  <div class="tool-btn" id="tool-clear" onclick="clearAll()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg><span class="tt">Clear All</span></div>
 </div>
 
 <!-- LAYER PANEL -->
 <div class="layer-panel" id="layer-panel">
-  <div class="layer-title">Layers</div>
-
-  <div class="layer-item" onclick="toggleLayer('ortho')">
-    <div class="layer-check active" id="check-ortho"></div>
-    <span class="layer-label">Orthomosaic</span>
+  <div class="lt">Flight Date</div>
+  <div class="date-select-wrap">
+    <select class="date-select" id="date-select" onchange="switchFlight(this.value)"><option value="0" selected="">Feb 21, 2026</option></select>
   </div>
 
-  <div class="layer-item" onclick="toggleLayer('satellite')">
-    <div class="layer-check active" id="check-satellite"></div>
-    <span class="layer-label">Satellite</span>
+  <div class="ld"></div>
+  <div class="lt">Units</div>
+  <div class="date-select-wrap">
+    <select class="date-select" id="unit-select" onchange="switchUnits(this.value)">
+      <option value="ft" selected="">Feet (ft)</option>
+      <option value="ft-in">Feet + Inches (5' 6")</option>
+      <option value="ft-dec">Decimal Feet (5.50 ft)</option>
+      <option value="m">Meters (m)</option>
+    </select>
   </div>
 
-  <div class="layer-divider"></div>
+  <div class="ld"></div>
+  <div class="lt">Layers</div>
 
-  <div class="layer-item" onclick="toggleLayer('contours')">
-    <div class="layer-check" id="check-contours"></div>
-    <span class="layer-label">Contour Lines</span>
-    <span class="layer-tag">coming soon</span>
+  <div class="li" onclick="toggleLayer(&#39;ortho&#39;)"><div class="lc active" id="check-ortho"></div><span class="ll">Orthomosaic</span></div>
+  <div class="orow"><span class="olbl">Opacity</span><input type="range" class="oslider" id="op-ortho" min="0" max="100" value="90" oninput="setLayerOp(&#39;ortho&#39;,this.value)"><span class="oval" id="opval-ortho">90%</span></div>
+
+  <div class="ld"></div>
+
+  <div class="li" onclick="toggleLayer(&#39;satellite&#39;)"><div class="lc active" id="check-satellite"></div><span class="ll">Satellite</span></div>
+  <div class="orow"><span class="olbl">Opacity</span><input type="range" class="oslider" id="op-satellite" min="0" max="100" value="100" oninput="setLayerOp(&#39;satellite&#39;,this.value)"><span class="oval" id="opval-satellite">100%</span></div>
+
+  <div class="ld"></div>
+
+  <!-- CAD DRAWINGS — collapsible -->
+  <div class="cad-header" onclick="toggleCadPanel()">
+    <div class="lt" style="margin-bottom:0;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+      CAD Drawings <span class="cad-arrow" id="cad-arrow">▶</span>
+    </div>
+  </div>
+  <div class="cad-body" id="cad-body" style="display:none">
+    <div id="cad-layers-list"></div>
+    <div class="cad-empty" id="cad-empty" style="font-size: 10px; color: rgba(255, 255, 255, 0.3); padding: 6px 0px; font-style: italic; display: block;">No CAD drawings loaded</div>
   </div>
 
-  <div class="layer-item" onclick="toggleLayer('gcps')">
-    <div class="layer-check" id="check-gcps"></div>
-    <span class="layer-label">GCP Markers</span>
-    <span class="layer-tag">coming soon</span>
+  <div class="ld"></div>
+
+  <div class="li" onclick="toggleLayer(&#39;contours&#39;)"><div class="lc" id="check-contours"></div><span class="ll">Contour Lines</span><span class="ltag">coming soon</span></div>
+  <div class="li" onclick="toggleLayer(&#39;gcps&#39;)"><div class="lc" id="check-gcps"></div><span class="ll">GCP Markers</span><span class="ltag">coming soon</span></div>
+</div>
+
+<div class="ds" id="ds"><div class="ds-t" id="ds-text">Flight Date: <strong>February 21, 2026</strong></div></div>
+
+<!-- COMPARE DATE SELECTORS -->
+<div class="compare-selectors" id="compare-selectors">
+  <label>Left</label><select id="cmp-left" onchange="updateCompare()"><option value="0" selected="">Feb 21, 2026</option><option value="satellite">Satellite (Esri)</option></select>
+  <span class="compare-vs">vs</span>
+  <label>Right</label><select id="cmp-right" onchange="updateCompare()"><option value="0" selected="">Feb 21, 2026</option><option value="satellite" selected="">Satellite (Esri)</option></select>
+</div>
+
+<div class="toast" id="toast" style="display: none;">Draw freely on the map. <b>ESC</b> to stop.</div>
+<div class="ni-wrap" id="ni" style="display: none;">
+  <label>Add Annotation</label>
+  <input type="text" id="ni-t" placeholder="Title (e.g. Crack in foundation)">
+  <textarea id="ni-d" rows="2" placeholder="Description (optional)"></textarea>
+  <div class="ni-btns"><button class="btn-c" onclick="cancelNote()">Cancel</button><button class="btn-s" onclick="saveNote()">Save</button></div>
+</div>
+<div class="rp" id="rp">
+  <span class="rp-close" onclick="hideReport()">×</span>
+  <h3>Annotation Report</h3>
+  <div class="rs" id="rp-sub">SKYNEX Media — Marlboro Township</div>
+  <div id="rpc"></div>
+  <div class="rp-acts"><button class="btn-cp" onclick="copyReport()">Copy Text</button><button class="btn-pr" onclick="printReport()">Print / PDF</button></div>
+</div>
+<!-- PEN OPTIONS -->
+<div class="pen-opts" id="pen-opts" style="display: none;">
+  <div class="pen-opts-title">Pen Color</div>
+  <div class="pen-colors" id="pen-colors">
+    <div class="pen-color active" style="background:#F4B400" onclick="setPenColor(&#39;#F4B400&#39;,this)"></div>
+    <div class="pen-color" style="background:#FF3B30" onclick="setPenColor(&#39;#FF3B30&#39;,this)"></div>
+    <div class="pen-color" style="background:#34C759" onclick="setPenColor(&#39;#34C759&#39;,this)"></div>
+    <div class="pen-color" style="background:#007AFF" onclick="setPenColor(&#39;#007AFF&#39;,this)"></div>
+    <div class="pen-color" style="background:#FF9500" onclick="setPenColor(&#39;#FF9500&#39;,this)"></div>
+    <div class="pen-color" style="background:#AF52DE" onclick="setPenColor(&#39;#AF52DE&#39;,this)"></div>
+    <div class="pen-color" style="background:#ffffff" onclick="setPenColor(&#39;#ffffff&#39;,this)"></div>
   </div>
-
-  <div class="layer-divider"></div>
-
-  <div class="opacity-row">
-    <span class="opacity-label">Opacity</span>
-    <input type="range" class="opacity-slider" id="ortho-opacity" min="0" max="100" value="90" oninput="setOrthoOpacity(this.value)">
-    <span class="opacity-val" id="opacity-val">90%</span>
+  <div class="pen-width-row">
+    <label>Width</label>
+    <input type="range" min="1" max="10" value="3" id="pen-width" oninput="penWidth=parseInt(this.value);document.getElementById(&#39;pw-val&#39;).textContent=this.value+&#39;px&#39;">
+    <span id="pw-val">3px</span>
   </div>
 </div>
 
-<!-- DATE STAMP -->
-<div class="date-stamp" id="date-stamp">
-  <div class="date-stamp-text">Flight Date: <strong>February 21, 2026</strong></div>
-</div>
+<!-- DRAW CANVAS -->
+<canvas class="draw-canvas" id="draw-canvas" width="1528" height="732"></canvas>
 
-<!-- COMPARE LABELS -->
-<div class="compare-labels" id="compare-labels">
-  <div class="compare-label compare-label-left">
-    <div class="compare-sublabel">Orthomosaic</div>
-    <div class="compare-date">Feb 21, 2026</div>
+<!-- SCREENSHOT FLASH -->
+<div class="screenshot-flash" id="ss-flash"></div>
+
+<!-- SCREENSHOT PREVIEW -->
+<div class="screenshot-preview" id="ss-preview">
+  <span class="sp-close" onclick="document.getElementById(&#39;ss-preview&#39;).style.display=&#39;none&#39;">×</span>
+  <div class="sp-title">Screenshot Captured</div>
+  <img id="ss-img" src="file:///C:/Users/jarek/Downloads/index_8.html">
+  <div class="sp-actions">
+    <button class="btn-cp" onclick="copyScreenshot()">Copy</button>
+    <button class="btn-pr" onclick="downloadScreenshot()">Download</button>
+    <button class="btn-c" onclick="document.getElementById(&#39;ss-preview&#39;).style.display=&#39;none&#39;">Close</button>
   </div>
-  <div class="compare-label compare-label-right">
-    <div class="compare-sublabel">Satellite</div>
-    <div class="compare-date">Esri Basemap</div>
-  </div>
 </div>
 
-<!-- MEASUREMENT RESULT -->
-<div class="measure-result" id="measure-result">
-  <span class="result-close" onclick="hideMeasureResult()">&times;</span>
-  <div class="result-value" id="result-value">0.00 ft</div>
-  <div class="result-label" id="result-label">Distance</div>
-</div>
-
-<!-- INSTRUCTION TOAST -->
-<div class="toast" id="toast"></div>
-
-<!-- COORDINATE DISPLAY -->
-<div class="coord-display" id="coords">40.3186°N, 74.2439°W</div>
-
-<!-- MAP -->
-<div id="map"></div>
+<div class="loupe" id="loupe"><div id="loupe-inner" style="width:100%;height:100%"></div><div class="loupe-crosshair"></div><div class="loupe-label">3× Zoom</div></div>
+<div class="cd" id="coords">40.317371°N, 74.243127°W</div>
+<div id="map" class="leaflet-container leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="outline-style: none;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(0px, 0px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 22; transform: translate3d(383px, 183px, 0px) scale(0.5);"></div><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 23; transform: translate3d(383px, 183px, 0px) scale(1);"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(222px, 100px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(478px, 100px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(222px, -156px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(478px, -156px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(222px, 356px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(478px, 356px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-34px, 100px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(734px, 100px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-34px, -156px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(734px, -156px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-34px, 356px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(734px, 356px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(222px, -412px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-34px, -412px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(478px, -412px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-290px, -156px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-290px, 100px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-290px, -412px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(734px, -412px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-290px, 356px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-546px, -156px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(990px, -156px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-546px, 100px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(990px, 100px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-546px, -412px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(990px, -412px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-546px, 356px, 0px); opacity: 1;"><img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(990px, 356px, 0px); opacity: 1;"></div></div><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 23; transform: translate3d(383px, 183px, 0px) scale(1);"><img alt="" src="./index_files/38504" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(222px, 100px, 0px); opacity: 1;"><img alt="" src="./index_files/38505" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(478px, 100px, 0px); opacity: 1;"><img alt="" src="./index_files/38504(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(222px, -156px, 0px); opacity: 1;"><img alt="" src="./index_files/38505(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(478px, -156px, 0px); opacity: 1;"><img alt="" src="./index_files/38504(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(222px, 356px, 0px); opacity: 1;"><img alt="" src="./index_files/38505(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(478px, 356px, 0px); opacity: 1;"><img alt="" src="./index_files/38503" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-34px, 100px, 0px); opacity: 1;"><img alt="" src="./index_files/38506" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(734px, 100px, 0px); opacity: 1;"><img alt="" src="./index_files/38503(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-34px, -156px, 0px); opacity: 1;"><img alt="" src="./index_files/38506(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(734px, -156px, 0px); opacity: 1;"><img alt="" src="./index_files/38503(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-34px, 356px, 0px); opacity: 1;"><img alt="" src="./index_files/38506(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(734px, 356px, 0px); opacity: 1;"><img alt="" src="./index_files/38504(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(222px, -412px, 0px); opacity: 1;"><img alt="" src="./index_files/38503(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-34px, -412px, 0px); opacity: 1;"><img alt="" src="./index_files/38505(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(478px, -412px, 0px); opacity: 1;"><img alt="" src="./index_files/38502" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-290px, -156px, 0px); opacity: 1;"><img alt="" src="./index_files/38502(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-290px, 100px, 0px); opacity: 1;"><img alt="" src="./index_files/38502(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-290px, -412px, 0px); opacity: 1;"><img alt="" src="./index_files/38506(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(734px, -412px, 0px); opacity: 1;"><img alt="" src="./index_files/38502(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-290px, 356px, 0px); opacity: 1;"><img alt="" src="./index_files/38501" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-546px, -156px, 0px); opacity: 1;"><img alt="" src="./index_files/38507" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(990px, -156px, 0px); opacity: 1;"><img alt="" src="./index_files/38501(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-546px, 100px, 0px); opacity: 1;"><img alt="" src="./index_files/38507(1)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(990px, 100px, 0px); opacity: 1;"><img alt="" src="./index_files/38501(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-546px, -412px, 0px); opacity: 1;"><img alt="" src="./index_files/38507(2)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(990px, -412px, 0px); opacity: 1;"><img alt="" src="./index_files/38501(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-546px, 356px, 0px); opacity: 1;"><img alt="" src="./index_files/38507(3)" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(990px, 356px, 0px); opacity: 1;"></div></div><div class="leaflet-layer " style="z-index: 1; opacity: 0.9;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 22; transform: translate3d(383px, 183px, 0px) scale(0.5);"></div><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 23; transform: translate3d(383px, 183px, 0px) scale(1);"><img alt="" src="file:///C:/Users/jarek/Downloads/17/38504/49469.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(222px, 100px, 0px); opacity: 1;"><img alt="" src="file:///C:/Users/jarek/Downloads/17/38505/49469.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(478px, 100px, 0px); opacity: 1;"><img alt="" src="file:///C:/Users/jarek/Downloads/17/38504/49468.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(222px, -156px, 0px); opacity: 1;"><img alt="" src="file:///C:/Users/jarek/Downloads/17/38505/49468.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(478px, -156px, 0px); opacity: 1;"><img alt="" src="file:///C:/Users/jarek/Downloads/17/38504/49470.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(222px, 356px, 0px); opacity: 1;"><img alt="" src="file:///C:/Users/jarek/Downloads/17/38505/49470.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(478px, 356px, 0px); opacity: 1;"><img alt="" src="file:///C:/Users/jarek/Downloads/17/38503/49469.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(-34px, 100px, 0px); opacity: 1;"><img alt="" src="file:///C:/Users/jarek/Downloads/17/38503/49468.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(-34px, -156px, 0px); opacity: 1;"><img alt="" src="file:///C:/Users/jarek/Downloads/17/38503/49470.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(-34px, 356px, 0px); opacity: 1;"></div></div></div><div class="leaflet-pane leaflet-overlay-pane"></div><div class="leaflet-pane leaflet-shadow-pane"></div><div class="leaflet-pane leaflet-marker-pane"></div><div class="leaflet-pane leaflet-tooltip-pane"></div><div class="leaflet-pane leaflet-popup-pane"></div><div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(9.85718e+06px, 1.26641e+07px, 0px) scale(65536);"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"></div><div class="leaflet-top leaflet-right"></div><div class="leaflet-bottom leaflet-left"></div><div class="leaflet-bottom leaflet-right"><div class="leaflet-control-scale leaflet-control"><div class="leaflet-control-scale-line" style="width: 110px;">100 m</div><div class="leaflet-control-scale-line" style="width: 101px;">300 ft</div></div><div class="leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="file:///C:/Users/jarek/Downloads/index_8.html#" title="Zoom in" role="button" aria-label="Zoom in" aria-disabled="false"><span aria-hidden="true">+</span></a><a class="leaflet-control-zoom-out" href="file:///C:/Users/jarek/Downloads/index_8.html#" title="Zoom out" role="button" aria-label="Zoom out" aria-disabled="false"><span aria-hidden="true">−</span></a></div><div class="leaflet-control-attribution leaflet-control">© Esri</div></div></div></div>
 
 <script>
-// =============================================
-// CONFIG
-// =============================================
-var FLIGHT_DATE = 'February 21, 2026';
+// ============================================================
+// FLIGHT CONFIG — ADD NEW FLIGHTS HERE
+// Each entry: { id, date, label, folder, bounds }
+// folder = subfolder name containing tiles (z/x/y.png)
+// When you add a new flight, just add a new entry and push tiles
+// ============================================================
+var FLIGHTS = [
+  {
+    id: '2026-02-21',
+    date: 'February 21, 2026',
+    label: 'Feb 21, 2026',
+    folder: '.',
+    bounds: [[40.31681787617521,-74.24589198549170],[40.32047817458884,-74.24189684928949]]
+  }
+  // ADD MORE FLIGHTS HERE:
+  // {
+  //   id: '2026-03-15',
+  //   date: 'March 15, 2026',
+  //   label: 'Mar 15, 2026',
+  //   folder: '2026-03-15',
+  //   bounds: [[40.3168,-74.2459],[40.3205,-74.2419]]
+  // }
+];
 
-// Bounds from gdal2tiles
-var sw = [40.31681787617521, -74.24589198549170];
-var ne = [40.32047817458884, -74.24189684928949];
-var bounds = L.latLngBounds(
-  [Math.min(sw[0], ne[0]), Math.min(sw[1], ne[1])],
-  [Math.max(sw[0], ne[0]), Math.max(sw[1], ne[1])]
-);
-var center = bounds.getCenter();
+// ============================================================
+// CAD DRAWING LAYERS — ADD CAD OVERLAYS HERE
+// Export each discipline as transparent PNG from Civil 3D/AutoCAD
+// Place in /cad/ folder. All share the same site bounds.
+// color = visual identifier dot in the layer panel
+// ============================================================
+var CAD_BOUNDS = [[40.31681787617521,-74.24589198549170],[40.32047817458884,-74.24189684928949]];
 
-// =============================================
+var CAD_LAYERS = [
+  // UNCOMMENT AND ADD YOUR CAD DRAWINGS:
+  // { id: 'site-plan', name: 'Site Plan', url: './cad/site-plan.png', color: '#ffffff' },
+  // { id: 'grading', name: 'Grading Plan', url: './cad/grading.png', color: '#FF9800' },
+  // { id: 'sewer', name: 'Sewer', url: './cad/sewer.png', color: '#4CAF50' },
+  // { id: 'water', name: 'Water', url: './cad/water.png', color: '#2196F3' },
+  // { id: 'electric', name: 'Electrical', url: './cad/electric.png', color: '#FFC107' },
+  // { id: 'gas', name: 'Gas', url: './cad/gas.png', color: '#FF5722' },
+  // { id: 'walls', name: 'Walls / Foundation', url: './cad/walls.png', color: '#9C27B0' },
+  // { id: 'stormwater', name: 'Stormwater', url: './cad/stormwater.png', color: '#00BCD4' },
+];
+
+// ============================================================
 // MAP INIT
-// =============================================
-var map = L.map('map', {
-  center: center,
-  zoom: 18,
-  minZoom: 13,
-  maxZoom: 21,
-  zoomControl: false,
-  attributionControl: true
-});
+// ============================================================
+var currentFlightIdx = 0;
+var fl = FLIGHTS[0];
+var orthoBounds = L.latLngBounds(fl.bounds[0], fl.bounds[1]);
+var center = orthoBounds.getCenter();
 
-// Zoom control top-left, below toolbar
-L.control.zoom({ position: 'bottomright' }).addTo(map);
+var map = L.map('map',{center:center,zoom:18,minZoom:13,maxZoom:23,zoomControl:false,attributionControl:false,doubleClickZoom:false,tap:true});
+L.control.attribution({prefix:false}).addTo(map);
+L.control.zoom({position:'bottomright'}).addTo(map);
+L.control.scale({position:'bottomright',imperial:true,metric:true,maxWidth:150}).addTo(map);
 
-// Scale bar
-L.control.scale({ position: 'bottomright', imperial: true, metric: false, maxWidth: 150 }).addTo(map);
-
-// =============================================
+// ============================================================
 // LAYERS
-// =============================================
+// ============================================================
+function tileUrl(folder){return(folder==='.'?'':folder+'/')+ '{z}/{x}/{y}.png'}
 
-// Black background
-var blackBg = L.tileLayer('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', {
-  minZoom: 13, maxZoom: 21
-});
-blackBg.addTo(map);
+var blackBg = L.tileLayer('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',{minZoom:13,maxZoom:23}).addTo(map);
+var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'&copy; Esri',minZoom:13,maxZoom:23,maxNativeZoom:19}).addTo(map);
+var orthoLayer = L.tileLayer(tileUrl(fl.folder),{tms:0,opacity:.9,minZoom:15,maxZoom:23,maxNativeZoom:21,bounds:orthoBounds}).addTo(map);
 
-// Satellite (Esri)
-var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-  attribution: '&copy; Esri',
-  minZoom: 13, maxZoom: 21
-});
-satellite.addTo(map);
+// CAD overlay layers
+var cadLayerObjects = {}; // id -> L.imageOverlay
+var cadLayerState = {}; // id -> true/false
 
-// Ortho
-var orthoLayer = L.tileLayer('./{z}/{x}/{y}.png', {
-  tms: 0,
-  opacity: 0.9,
-  minZoom: 15,
-  maxZoom: 21,
-  bounds: bounds
-});
-orthoLayer.addTo(map);
+function initCadLayers(){
+  var listEl = document.getElementById('cad-layers-list');
+  var emptyEl = document.getElementById('cad-empty');
+  listEl.innerHTML = '';
 
-// Fit to ortho
-map.fitBounds(bounds, { padding: [60, 60] });
-
-// =============================================
-// LAYER TOGGLES
-// =============================================
-var layerState = { ortho: true, satellite: true, contours: false, gcps: false };
-
-function toggleLayer(id) {
-  if (id === 'contours' || id === 'gcps') return;
-  var checkEl = document.getElementById('check-' + id);
-  layerState[id] = !layerState[id];
-  checkEl.classList.toggle('active', layerState[id]);
-
-  if (id === 'ortho') {
-    layerState.ortho ? map.addLayer(orthoLayer) : map.removeLayer(orthoLayer);
-  }
-  if (id === 'satellite') {
-    layerState.satellite ? map.addLayer(satellite) : map.removeLayer(satellite);
-  }
-}
-
-function setOrthoOpacity(val) {
-  orthoLayer.setOpacity(val / 100);
-  document.getElementById('opacity-val').textContent = val + '%';
-}
-
-// =============================================
-// COORDINATE TRACKER
-// =============================================
-var coordEl = document.getElementById('coords');
-map.on('mousemove', function(e) {
-  coordEl.textContent = e.latlng.lat.toFixed(6) + '°N, ' + Math.abs(e.latlng.lng).toFixed(6) + '°W';
-});
-map.on('moveend', function() {
-  var c = map.getCenter();
-  coordEl.textContent = c.lat.toFixed(6) + '°N, ' + Math.abs(c.lng).toFixed(6) + '°W';
-});
-
-// =============================================
-// MEASUREMENT TOOLS
-// =============================================
-var currentTool = null;
-var measurePoints = [];
-var measureMarkers = [];
-var measureLines = [];
-var measurePolygons = [];
-var pinMarkers = [];
-var tempLine = null;
-
-function activateTool(tool) {
-  // Deactivate if same tool clicked
-  if (currentTool === tool) {
-    deactivateTool();
+  if(CAD_LAYERS.length === 0){
+    emptyEl.style.display = 'block';
     return;
   }
+  emptyEl.style.display = 'none';
 
-  deactivateTool();
-  currentTool = tool;
-  document.getElementById('tool-' + tool).classList.add('active');
-  map.getContainer().style.cursor = 'crosshair';
+  CAD_LAYERS.forEach(function(c){
+    cadLayerState[c.id] = false;
+    cadLayerObjects[c.id] = L.imageOverlay(c.url, CAD_BOUNDS, {opacity: 0.7});
 
-  if (tool === 'distance') {
-    showToast('Click points to measure distance. <span class="toast-key">Double-click</span> to finish.');
-  } else if (tool === 'area') {
-    showToast('Click points to draw area. <span class="toast-key">Double-click</span> to close & measure.');
-  } else if (tool === 'pin') {
-    showToast('Click on the map to <span class="toast-key">drop a pin</span>.');
+    var item = document.createElement('div');
+    item.innerHTML =
+      '<div class="cad-layer-item" onclick="toggleCadLayer(\''+c.id+'\')">' +
+        '<div class="cad-layer-check" id="cad-check-'+c.id+'"></div>' +
+        '<div class="cad-color-dot" style="background:'+c.color+'"></div>' +
+        '<span class="cad-layer-name">'+c.name+'</span>' +
+      '</div>' +
+      '<div class="cad-opacity-row">' +
+        '<input type="range" class="oslider" min="0" max="100" value="70" oninput="setCadOp(\''+c.id+'\',this.value)">' +
+        '<span class="oval" id="cad-opval-'+c.id+'">70%</span>' +
+      '</div>';
+    listEl.appendChild(item);
+  });
+}
+initCadLayers();
+
+function toggleCadPanel(){
+  var body = document.getElementById('cad-body');
+  var arrow = document.getElementById('cad-arrow');
+  if(body.style.display === 'none'){
+    body.style.display = 'block';
+    arrow.classList.add('open');
+  } else {
+    body.style.display = 'none';
+    arrow.classList.remove('open');
   }
 }
 
-function deactivateTool() {
-  if (currentTool) {
-    document.getElementById('tool-' + currentTool).classList.remove('active');
+function toggleCadLayer(id){
+  cadLayerState[id] = !cadLayerState[id];
+  document.getElementById('cad-check-'+id).classList.toggle('active', cadLayerState[id]);
+  if(cadLayerState[id]){
+    cadLayerObjects[id].addTo(map);
+  } else {
+    map.removeLayer(cadLayerObjects[id]);
   }
-  currentTool = null;
-  measurePoints = [];
-  if (tempLine) { map.removeLayer(tempLine); tempLine = null; }
-  map.getContainer().style.cursor = '';
-  hideToast();
 }
 
-// Map click handler
-map.on('click', function(e) {
-  if (!currentTool) return;
-
-  if (currentTool === 'pin') {
-    dropPin(e.latlng);
-    deactivateTool();
-    return;
-  }
-
-  if (currentTool === 'distance' || currentTool === 'area') {
-    measurePoints.push(e.latlng);
-
-    // Add vertex marker
-    var marker = L.circleMarker(e.latlng, {
-      radius: 5,
-      color: '#0a0a0a',
-      fillColor: '#F4B400',
-      fillOpacity: 1,
-      weight: 2
-    }).addTo(map);
-    measureMarkers.push(marker);
-
-    // Draw connecting line
-    if (measurePoints.length > 1) {
-      var segment = L.polyline(
-        [measurePoints[measurePoints.length - 2], measurePoints[measurePoints.length - 1]],
-        { color: '#F4B400', weight: 2, dashArray: '6,6', opacity: 0.9 }
-      ).addTo(map);
-      measureLines.push(segment);
-    }
-  }
-});
-
-// Double click to finish
-map.on('dblclick', function(e) {
-  if (!currentTool) return;
-  L.DomEvent.stopPropagation(e);
-  L.DomEvent.preventDefault(e);
-
-  if (currentTool === 'distance' && measurePoints.length >= 2) {
-    finishDistance();
-  } else if (currentTool === 'area' && measurePoints.length >= 3) {
-    finishArea();
-  }
-});
-
-// Disable default double-click zoom
-map.doubleClickZoom.disable();
-
-function finishDistance() {
-  var totalFeet = 0;
-  for (var i = 1; i < measurePoints.length; i++) {
-    totalFeet += measurePoints[i-1].distanceTo(measurePoints[i]) * 3.28084;
-  }
-  showMeasureResult(formatDistance(totalFeet), 'Total Distance');
-  deactivateTool();
+function setCadOp(id, v){
+  cadLayerObjects[id].setOpacity(v / 100);
+  document.getElementById('cad-opval-'+id).textContent = v + '%';
 }
 
-function finishArea() {
-  // Close the polygon visually
-  var closingLine = L.polyline(
-    [measurePoints[measurePoints.length - 1], measurePoints[0]],
-    { color: '#F4B400', weight: 2, dashArray: '6,6', opacity: 0.9 }
-  ).addTo(map);
-  measureLines.push(closingLine);
+map.fitBounds(orthoBounds,{padding:[60,60]});
 
-  // Fill polygon
-  var polygon = L.polygon(measurePoints, {
-    color: '#F4B400',
-    fillColor: '#F4B400',
-    fillOpacity: 0.12,
-    weight: 2,
-    dashArray: '6,6'
-  }).addTo(map);
-  measurePolygons.push(polygon);
+var layerState = {ortho:true,satellite:true,contours:false,gcps:false};
 
-  // Remove the individual line segments since polygon draws the outline
-  // Actually keep them for the dashed look
-
-  var sqMeters = calculatePolygonArea(measurePoints);
-  var sqFeet = sqMeters * 10.7639;
-  var acres = sqFeet / 43560;
-
-  var display = formatArea(sqFeet);
-  if (acres >= 0.1) {
-    display += ' (' + acres.toFixed(2) + ' ac)';
-  }
-
-  showMeasureResult(display, 'Area');
-  deactivateTool();
+function toggleLayer(id){
+  if(id==='contours'||id==='gcps') return;
+  layerState[id]=!layerState[id];
+  document.getElementById('check-'+id).classList.toggle('active',layerState[id]);
+  if(id==='ortho') layerState.ortho?map.addLayer(orthoLayer):map.removeLayer(orthoLayer);
+  if(id==='satellite') layerState.satellite?map.addLayer(satellite):map.removeLayer(satellite);
 }
 
-function calculatePolygonArea(latlngs) {
-  // Shoelace formula on projected coords
-  var area = 0;
-  var n = latlngs.length;
-  for (var i = 0; i < n; i++) {
-    var j = (i + 1) % n;
-    var p1 = map.project(latlngs[i], map.getZoom());
-    var p2 = map.project(latlngs[j], map.getZoom());
-    area += p1.x * p2.y;
-    area -= p2.x * p1.y;
-  }
-  area = Math.abs(area) / 2;
-
-  // Convert pixel area to meters
-  var metersPerPixel = 40075016.686 * Math.cos(center.lat * Math.PI / 180) / Math.pow(2, map.getZoom() + 8);
-  return area * metersPerPixel * metersPerPixel;
+function setLayerOp(id,v){
+  if(id==='ortho') orthoLayer.setOpacity(v/100);
+  if(id==='satellite') satellite.setOpacity(v/100);
+  document.getElementById('opval-'+id).textContent=v+'%';
 }
 
-function dropPin(latlng) {
-  var pinIcon = L.divIcon({
-    className: '',
-    html: '<svg width="24" height="36" viewBox="0 0 24 36"><path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 24 12 24s12-15 12-24C24 5.37 18.63 0 12 0z" fill="#F4B400"/><circle cx="12" cy="12" r="5" fill="#0a0a0a"/></svg>',
-    iconSize: [24, 36],
-    iconAnchor: [12, 36],
-    popupAnchor: [0, -36]
+// ============================================================
+// FLIGHT SELECTOR
+// ============================================================
+function populateFlightSelectors(){
+  var sel=document.getElementById('date-select');
+  var cmpL=document.getElementById('cmp-left');
+  var cmpR=document.getElementById('cmp-right');
+  sel.innerHTML='';cmpL.innerHTML='';cmpR.innerHTML='';
+
+  FLIGHTS.forEach(function(f,i){
+    sel.innerHTML+='<option value="'+i+'"'+(i===0?' selected':'')+'>'+f.label+'</option>';
+    cmpL.innerHTML+='<option value="'+i+'"'+(i===0?' selected':'')+'>'+f.label+'</option>';
+    var rIdx=FLIGHTS.length>1?1:0;
+    cmpR.innerHTML+='<option value="'+i+'"'+(i===rIdx?' selected':'')+'>'+f.label+'</option>';
   });
 
-  var pin = L.marker(latlng, { icon: pinIcon }).addTo(map);
-  pin.bindPopup(
-    '<div class="pin-popup-title">Pinned Location</div>' +
-    '<div class="pin-popup-coords">' + latlng.lat.toFixed(6) + '°N, ' + Math.abs(latlng.lng).toFixed(6) + '°W</div>'
-  ).openPopup();
-  pinMarkers.push(pin);
+  // Add satellite option to compare right
+  cmpR.innerHTML+='<option value="satellite"'+(FLIGHTS.length<2?' selected':'')+'>Satellite (Esri)</option>';
+  cmpL.innerHTML+='<option value="satellite">Satellite (Esri)</option>';
+}
+populateFlightSelectors();
+
+function switchFlight(idx){
+  idx=parseInt(idx);
+  currentFlightIdx=idx;
+  var f=FLIGHTS[idx];
+  orthoBounds=L.latLngBounds(f.bounds[0],f.bounds[1]);
+
+  map.removeLayer(orthoLayer);
+  orthoLayer=L.tileLayer(tileUrl(f.folder),{tms:0,opacity:document.getElementById('op-ortho').value/100,minZoom:15,maxZoom:23,maxNativeZoom:21,bounds:orthoBounds}).addTo(map);
+  if(!layerState.ortho) map.removeLayer(orthoLayer);
+
+  document.getElementById('ds-text').innerHTML='Flight Date: <strong>'+f.date+'</strong>';
+  map.fitBounds(orthoBounds,{padding:[60,60]});
 }
 
-function formatDistance(feet) {
-  if (feet >= 5280) {
-    return (feet / 5280).toFixed(2) + ' mi';
-  }
-  return feet.toFixed(1) + ' ft';
-}
+// ============================================================
+// COORDINATES
+// ============================================================
+var coordEl=document.getElementById('coords');
+map.on('mousemove',function(e){coordEl.textContent=e.latlng.lat.toFixed(6)+'\u00b0N, '+Math.abs(e.latlng.lng).toFixed(6)+'\u00b0W'});
+map.on('moveend',function(){var c=map.getCenter();coordEl.textContent=c.lat.toFixed(6)+'\u00b0N, '+Math.abs(c.lng).toFixed(6)+'\u00b0W'});
 
-function formatArea(sqFeet) {
-  if (sqFeet >= 43560) {
-    return (sqFeet / 43560).toFixed(2) + ' ac';
-  }
-  return numberWithCommas(Math.round(sqFeet)) + ' sq ft';
-}
+// ============================================================
+// MOBILE TOGGLES
+// ============================================================
+var mobToolbarOpen=false,mobLayersOpen=false;
+function toggleMobToolbar(){mobToolbarOpen=!mobToolbarOpen;document.getElementById('toolbar').classList.toggle('mob-open',mobToolbarOpen);document.getElementById('mob-toggle').classList.toggle('open',mobToolbarOpen);if(mobToolbarOpen&&mobLayersOpen){mobLayersOpen=false;document.getElementById('layer-panel').classList.remove('mob-open');document.getElementById('mob-layer-toggle').classList.remove('open')}}
+function toggleMobLayers(){mobLayersOpen=!mobLayersOpen;document.getElementById('layer-panel').classList.toggle('mob-open',mobLayersOpen);document.getElementById('mob-layer-toggle').classList.toggle('open',mobLayersOpen);if(mobLayersOpen&&mobToolbarOpen){mobToolbarOpen=false;document.getElementById('toolbar').classList.remove('mob-open');document.getElementById('mob-toggle').classList.remove('open')}}
+function isMobile(){return window.innerWidth<=768}
 
-function numberWithCommas(x) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-function showMeasureResult(value, label) {
-  document.getElementById('result-value').textContent = value;
-  document.getElementById('result-label').textContent = label;
-  document.getElementById('measure-result').style.display = 'block';
-}
-
-function hideMeasureResult() {
-  document.getElementById('measure-result').style.display = 'none';
-}
-
-function showToast(html) {
-  var toast = document.getElementById('toast');
-  toast.innerHTML = html;
-  toast.style.display = 'block';
-}
-
-function hideToast() {
-  document.getElementById('toast').style.display = 'none';
-}
-
-function clearAll() {
-  // Clear measurements
-  measureMarkers.forEach(function(m) { map.removeLayer(m); });
-  measureLines.forEach(function(l) { map.removeLayer(l); });
-  measurePolygons.forEach(function(p) { map.removeLayer(p); });
-  pinMarkers.forEach(function(p) { map.removeLayer(p); });
-  measureMarkers = [];
-  measureLines = [];
-  measurePolygons = [];
-  pinMarkers = [];
-  measurePoints = [];
-  hideMeasureResult();
-  deactivateTool();
-}
-
-// =============================================
-// COMPARE MODE
-// =============================================
-var compareActive = false;
-var sideBySide = null;
-
-function toggleCompare() {
-  compareActive = !compareActive;
-  document.getElementById('tool-compare').classList.toggle('active', compareActive);
-
-  if (compareActive) {
-    // Enter compare mode
-    document.getElementById('compare-labels').style.display = 'block';
-    document.getElementById('date-stamp').style.display = 'none';
-    document.getElementById('layer-panel').style.display = 'none';
-
-    // Ensure both layers are on map
-    if (!map.hasLayer(satellite)) map.addLayer(satellite);
-    if (!map.hasLayer(orthoLayer)) map.addLayer(orthoLayer);
-
-    // Create side-by-side control
-    sideBySide = L.control.sideBySide(orthoLayer, satellite).addTo(map);
-
-  } else {
-    // Exit compare mode
-    document.getElementById('compare-labels').style.display = 'none';
-    document.getElementById('date-stamp').style.display = 'block';
-    document.getElementById('layer-panel').style.display = 'block';
-
-    if (sideBySide) {
-      sideBySide.remove();
-      sideBySide = null;
-    }
-  }
-}
-
-// =============================================
-// KEYBOARD SHORTCUT — ESC to cancel
-// =============================================
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    if (currentTool) {
-      deactivateTool();
-    }
-    if (compareActive) {
-      toggleCompare();
-    }
+map.on('click',function(e){
+  if(currentTool) return;
+  if(isMobile()){
+    if(mobToolbarOpen){mobToolbarOpen=false;document.getElementById('toolbar').classList.remove('mob-open');document.getElementById('mob-toggle').classList.remove('open')}
+    if(mobLayersOpen){mobLayersOpen=false;document.getElementById('layer-panel').classList.remove('mob-open');document.getElementById('mob-layer-toggle').classList.remove('open')}
   }
 });
-</script>
 
-</body>
-</html>
+// ============================================================
+// TOOLS
+// ============================================================
+var currentTool=null,tp=[],allDrawn=[],annotations=[];
+
+function activateTool(t){
+  if(currentTool===t){deactivateTool();return}
+  deactivateTool();currentTool=t;document.getElementById('tool-'+t).classList.add('active');map.getContainer().style.cursor='crosshair';
+  if(isMobile()&&mobToolbarOpen){mobToolbarOpen=false;document.getElementById('toolbar').classList.remove('mob-open');document.getElementById('mob-toggle').classList.remove('open')}
+  var m={single:'Tap <b>two points</b> to measure.',chain:'Tap points. <b>Double-tap</b> to finish.',area:'Tap vertices. <b>Double-tap</b> to close.',circle:'Tap <b>center</b>, then <b>edge</b>.',rect:'Tap <b>first corner</b>, then <b>opposite</b>.',pin:'Tap to <b>drop a pin</b>.',note:'Tap to <b>place annotation</b>.'};
+  if(m[t])showToast(m[t]);
+}
+function deactivateTool(){if(currentTool){var el=document.getElementById('tool-'+currentTool);if(el)el.classList.remove('active')}currentTool=null;tp=[];map.getContainer().style.cursor='';hideToast()}
+
+// === UNITS ===
+var currentUnit = 'ft'; // ft, ft-in, ft-dec, m
+
+function switchUnits(u){ currentUnit = u; }
+
+function metersBtwn(a,b){ return a.distanceTo(b); }
+function ftBtwn(a,b){ return a.distanceTo(b) * 3.28084; }
+
+function fmtD(ft){
+  var m = ft / 3.28084;
+  if(currentUnit === 'm'){
+    if(m >= 1000) return (m/1000).toFixed(2) + ' km';
+    if(m >= 10) return m.toFixed(1) + ' m';
+    return m.toFixed(2) + ' m';
+  }
+  if(currentUnit === 'ft-in'){
+    var wholeFt = Math.floor(ft);
+    var inches = Math.round((ft - wholeFt) * 12);
+    if(inches === 12){ wholeFt++; inches = 0; }
+    if(ft >= 5280) return (ft/5280).toFixed(2) + ' mi';
+    if(inches === 0) return wholeFt.toLocaleString() + "'";
+    return wholeFt.toLocaleString() + "' " + inches + '"';
+  }
+  if(currentUnit === 'ft-dec'){
+    if(ft >= 5280) return (ft/5280).toFixed(2) + ' mi';
+    return ft.toFixed(2) + ' ft';
+  }
+  // default: ft
+  if(ft >= 5280) return (ft/5280).toFixed(2) + ' mi';
+  if(ft >= 100) return Math.round(ft).toLocaleString() + ' ft';
+  return ft.toFixed(1) + ' ft';
+}
+
+function fmtA(sf){
+  if(currentUnit === 'm'){
+    var sqm = sf / 10.7639;
+    if(sqm >= 10000) return (sqm/10000).toFixed(2) + ' ha';
+    if(sqm >= 100) return Math.round(sqm).toLocaleString() + ' m\u00b2';
+    return sqm.toFixed(1) + ' m\u00b2';
+  }
+  // imperial
+  if(sf >= 43560) return (sf/43560).toFixed(2) + ' ac';
+  return Math.round(sf).toLocaleString() + ' sq ft';
+}
+function mid(a,b){return L.latLng((a.lat+b.lat)/2,(a.lng+b.lng)/2)}
+function calcPA(pts){var a=0,n=pts.length;for(var i=0;i<n;i++){var j=(i+1)%n,p1=map.project(pts[i],20),p2=map.project(pts[j],20);a+=p1.x*p2.y-p2.x*p1.y}a=Math.abs(a)/2;var mpp=40075016.686*Math.cos(center.lat*Math.PI/180)/Math.pow(2,28);return a*mpp*mpp*10.7639}
+function addV(ll){var r=isMobile()?7:5;var m=L.circleMarker(ll,{radius:r,color:'#0a0a0a',fillColor:'#F4B400',fillOpacity:1,weight:2}).addTo(map);allDrawn.push(m);return m}
+function addL(a,b){var l=L.polyline([a,b],{color:'#F4B400',weight:2,opacity:.9,dashArray:'6,4'}).addTo(map);allDrawn.push(l);return l}
+function addLbl(ll,html,cls){var icon=L.divIcon({className:'',html:'<div class="'+(cls||'ml')+'">'+html+'</div>',iconAnchor:[0,0]});var m=L.marker(ll,{icon:icon,interactive:false}).addTo(map);allDrawn.push(m);return m}
+function showToast(h){var t=document.getElementById('toast');t.innerHTML=h;t.style.display='block'}
+function hideToast(){document.getElementById('toast').style.display='none'}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+// MAP CLICK
+map.on('click',function(e){
+  if(!currentTool)return;var ll=e.latlng;
+  if(currentTool==='single'){tp.push(ll);addV(ll);if(tp.length===2){var ft=ftBtwn(tp[0],tp[1]);addL(tp[0],tp[1]);addLbl(mid(tp[0],tp[1]),fmtD(ft));annotations.push({type:'Distance',value:fmtD(ft),coords:[tp[0],tp[1]]});tp=[]}return}
+  if(currentTool==='chain'){tp.push(ll);addV(ll);if(tp.length>1){var i=tp.length-1;addL(tp[i-1],tp[i]);addLbl(mid(tp[i-1],tp[i]),fmtD(ftBtwn(tp[i-1],tp[i])))}return}
+  if(currentTool==='area'){tp.push(ll);addV(ll);if(tp.length>1)addL(tp[tp.length-2],tp[tp.length-1]);return}
+  if(currentTool==='circle'){tp.push(ll);if(tp.length===1)addV(ll);if(tp.length===2){var ctr=tp[0],edge=tp[1],rFt=ftBtwn(ctr,edge),dFt=rFt*2,rM=ctr.distanceTo(edge);var circ=L.circle(ctr,{radius:rM,color:'#F4B400',weight:2,fillColor:'#F4B400',fillOpacity:.08,dashArray:'6,4'}).addTo(map);allDrawn.push(circ);addL(ctr,edge);addV(edge);addLbl(ctr,'\u2300 '+fmtD(dFt)+'<br>R: '+fmtD(rFt),'ml-circle');annotations.push({type:'Circle',value:'\u2300 '+fmtD(dFt)+', R: '+fmtD(rFt),coords:[ctr]});tp=[]}return}
+  if(currentTool==='rect'){tp.push(ll);addV(ll);if(tp.length===2){var rb=L.latLngBounds(tp[0],tp[1]);var rect=L.rectangle(rb,{color:'#F4B400',weight:2,fillColor:'#F4B400',fillOpacity:.1,dashArray:'6,4'}).addTo(map);allDrawn.push(rect);var nw=rb.getNorthWest(),ne2=rb.getNorthEast(),sw2=rb.getSouthWest();var wFt=ftBtwn(nw,ne2),hFt=ftBtwn(nw,sw2),sf=wFt*hFt;addLbl(mid(nw,ne2),fmtD(wFt));addLbl(mid(nw,sw2),fmtD(hFt));addLbl(rb.getCenter(),fmtA(sf)+'<br>'+fmtD(wFt)+' \u00d7 '+fmtD(hFt),'ml-area');annotations.push({type:'Rectangle',value:fmtA(sf)+' ('+fmtD(wFt)+' \u00d7 '+fmtD(hFt)+')',coords:[tp[0],tp[1]]});addV(tp[1]);tp=[]}return}
+  if(currentTool==='pin'){var pi=L.divIcon({className:'',html:'<svg width="28" height="42" viewBox="0 0 24 36"><path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 24 12 24s12-15 12-24C24 5.37 18.63 0 12 0z" fill="#F4B400"/><circle cx="12" cy="12" r="5" fill="#0a0a0a"/></svg>',iconSize:[28,42],iconAnchor:[14,42],popupAnchor:[0,-42]});var pin=L.marker(ll,{icon:pi}).addTo(map);pin.bindPopup('<div style="color:#F4B400;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Location Pin</div><div style="font-family:Consolas,monospace;font-size:11px;color:rgba(255,255,255,.5)">'+ll.lat.toFixed(6)+'\u00b0N, '+Math.abs(ll.lng).toFixed(6)+'\u00b0W</div>').openPopup();allDrawn.push(pin);annotations.push({type:'Pin',value:ll.lat.toFixed(6)+'\u00b0N, '+Math.abs(ll.lng).toFixed(6)+'\u00b0W',coords:[ll]});deactivateTool();return}
+  if(currentTool==='note'){tp=[ll];addV(ll);document.getElementById('ni').style.display='block';document.getElementById('ni-t').focus();hideToast();return}
+});
+
+// DBLCLICK
+map.on('dblclick',function(e){
+  if(!currentTool)return;L.DomEvent.preventDefault(e);
+  if(currentTool==='chain'&&tp.length>=2){var total=0;for(var i=1;i<tp.length;i++)total+=ftBtwn(tp[i-1],tp[i]);addLbl(tp[tp.length-1],'Total: '+fmtD(total),'ml-total');annotations.push({type:'Chain Distance',value:fmtD(total)+' ('+(tp.length-1)+' segments)',coords:tp.slice()});deactivateTool();return}
+  if(currentTool==='area'&&tp.length>=3){addL(tp[tp.length-1],tp[0]);var poly=L.polygon(tp,{color:'#F4B400',weight:2,fillColor:'#F4B400',fillOpacity:.1,dashArray:'6,4'}).addTo(map);allDrawn.push(poly);var sf=calcPA(tp),perim=0;for(var i=0;i<tp.length;i++){var j=(i+1)%tp.length;perim+=ftBtwn(tp[i],tp[j])}var lbl=fmtA(sf);if(sf>=43560)lbl+='<br>'+Math.round(sf).toLocaleString()+' sq ft';lbl+='<br>Perimeter: '+fmtD(perim);var clat=0,clng=0;tp.forEach(function(p){clat+=p.lat;clng+=p.lng});addLbl(L.latLng(clat/tp.length,clng/tp.length),lbl,'ml-area');annotations.push({type:'Area',value:fmtA(sf)+', Perimeter: '+fmtD(perim),coords:tp.slice()});deactivateTool();return}
+});
+
+// Mobile done button
+var doneBtn=document.createElement('div');doneBtn.innerHTML='Done \u2713';
+doneBtn.style.cssText='display:none;position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:#F4B400;color:#0a0a0a;font-weight:700;font-size:14px;padding:10px 28px;border-radius:8px;z-index:1001;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.4);-webkit-tap-highlight-color:transparent';
+document.body.appendChild(doneBtn);
+doneBtn.addEventListener('click',function(e){e.stopPropagation();
+  if(currentTool==='chain'&&tp.length>=2){var total=0;for(var i=1;i<tp.length;i++)total+=ftBtwn(tp[i-1],tp[i]);addLbl(tp[tp.length-1],'Total: '+fmtD(total),'ml-total');annotations.push({type:'Chain Distance',value:fmtD(total)+' ('+(tp.length-1)+' segments)',coords:tp.slice()});deactivateTool();doneBtn.style.display='none';return}
+  if(currentTool==='area'&&tp.length>=3){addL(tp[tp.length-1],tp[0]);var poly=L.polygon(tp,{color:'#F4B400',weight:2,fillColor:'#F4B400',fillOpacity:.1,dashArray:'6,4'}).addTo(map);allDrawn.push(poly);var sf=calcPA(tp),perim=0;for(var i=0;i<tp.length;i++){var j=(i+1)%tp.length;perim+=ftBtwn(tp[i],tp[j])}var lbl=fmtA(sf);if(sf>=43560)lbl+='<br>'+Math.round(sf).toLocaleString()+' sq ft';lbl+='<br>Perimeter: '+fmtD(perim);var clat=0,clng=0;tp.forEach(function(p){clat+=p.lat;clng+=p.lng});addLbl(L.latLng(clat/tp.length,clng/tp.length),lbl,'ml-area');annotations.push({type:'Area',value:fmtA(sf)+', Perimeter: '+fmtD(perim),coords:tp.slice()});deactivateTool();doneBtn.style.display='none';return}
+});
+setInterval(function(){if(!isMobile()){doneBtn.style.display='none';return}if(currentTool==='chain'&&tp.length>=2)doneBtn.style.display='block';else if(currentTool==='area'&&tp.length>=3)doneBtn.style.display='block';else doneBtn.style.display='none'},200);
+
+// NOTE
+function saveNote(){var t=document.getElementById('ni-t').value.trim()||'Note',d=document.getElementById('ni-d').value.trim(),pos=tp[0];var html='<div class="nt">'+esc(t)+'</div>';if(d)html+=esc(d);addLbl(pos,html,'ml-note');annotations.push({type:'Note',value:t+(d?': '+d:''),coords:[pos]});document.getElementById('ni').style.display='none';document.getElementById('ni-t').value='';document.getElementById('ni-d').value='';deactivateTool()}
+function cancelNote(){document.getElementById('ni').style.display='none';document.getElementById('ni-t').value='';document.getElementById('ni-d').value='';deactivateTool()}
+
+// CLEAR
+function clearAll(){allDrawn.forEach(function(i){map.removeLayer(i)});allDrawn=[];annotations=[];deactivateTool();hideToast();document.getElementById('ni').style.display='none';doneBtn.style.display='none';
+// Reset CAD layers
+CAD_LAYERS.forEach(function(c){if(cadLayerState[c.id]){map.removeLayer(cadLayerObjects[c.id]);cadLayerState[c.id]=false;document.getElementById('cad-check-'+c.id).classList.remove('active')}})}
+
+// ============================================================
+// COMPARE MODE
+// ============================================================
+var compActive=false,sbs=null,compOrthoR=null;
+
+function toggleCompare(){
+  compActive=!compActive;
+  document.getElementById('tool-compare').classList.toggle('active',compActive);
+  if(isMobile()&&mobToolbarOpen){mobToolbarOpen=false;document.getElementById('toolbar').classList.remove('mob-open');document.getElementById('mob-toggle').classList.remove('open')}
+
+  if(compActive){
+    document.getElementById('compare-selectors').style.display='block';
+    document.getElementById('ds').style.display='none';
+    document.getElementById('layer-panel').style.display='none';
+    if(isMobile())document.getElementById('mob-layer-toggle').style.display='none';
+    updateCompare();
+  } else {
+    document.getElementById('compare-selectors').style.display='none';
+    document.getElementById('ds').style.display='block';
+    if(isMobile()){document.getElementById('mob-layer-toggle').style.display='flex'}else{document.getElementById('layer-panel').style.display='block'}
+    if(sbs){sbs.remove();sbs=null}
+    if(compOrthoR){map.removeLayer(compOrthoR);compOrthoR=null}
+    // Re-add main ortho if it was on
+    if(layerState.ortho&&!map.hasLayer(orthoLayer))map.addLayer(orthoLayer);
+    if(layerState.satellite&&!map.hasLayer(satellite))map.addLayer(satellite);
+  }
+}
+
+function updateCompare(){
+  if(!compActive)return;
+  // Clean up previous compare
+  if(sbs){sbs.remove();sbs=null}
+  if(compOrthoR){map.removeLayer(compOrthoR);compOrthoR=null}
+
+  var leftVal=document.getElementById('cmp-left').value;
+  var rightVal=document.getElementById('cmp-right').value;
+
+  // Build left layer
+  var leftLayer;
+  if(leftVal==='satellite'){
+    leftLayer=satellite;
+    if(!map.hasLayer(satellite))map.addLayer(satellite);
+  } else {
+    var lf=FLIGHTS[parseInt(leftVal)];
+    // Use main ortho if same flight
+    if(parseInt(leftVal)===currentFlightIdx){
+      leftLayer=orthoLayer;
+    } else {
+      leftLayer=L.tileLayer(tileUrl(lf.folder),{tms:0,opacity:1,minZoom:15,maxZoom:23,maxNativeZoom:21,bounds:L.latLngBounds(lf.bounds[0],lf.bounds[1])}).addTo(map);
+      compOrthoR=leftLayer; // track for cleanup (reusing variable)
+    }
+    if(!map.hasLayer(leftLayer))map.addLayer(leftLayer);
+  }
+
+  // Build right layer
+  var rightLayer;
+  if(rightVal==='satellite'){
+    rightLayer=satellite;
+    if(!map.hasLayer(satellite))map.addLayer(satellite);
+  } else {
+    var rf=FLIGHTS[parseInt(rightVal)];
+    if(parseInt(rightVal)===currentFlightIdx&&leftVal!==rightVal){
+      rightLayer=orthoLayer;
+    } else if(rightVal!==leftVal){
+      rightLayer=L.tileLayer(tileUrl(rf.folder),{tms:0,opacity:1,minZoom:15,maxZoom:23,maxNativeZoom:21,bounds:L.latLngBounds(rf.bounds[0],rf.bounds[1])}).addTo(map);
+      if(compOrthoR)map.removeLayer(compOrthoR);
+      compOrthoR=rightLayer;
+    } else {
+      rightLayer=satellite;
+      if(!map.hasLayer(satellite))map.addLayer(satellite);
+    }
+    if(!map.hasLayer(rightLayer))map.addLayer(rightLayer);
+  }
+
+  sbs=L.control.sideBySide(leftLayer,rightLayer).addTo(map);
+}
+
+// ============================================================
+// LOUPE
+// ============================================================
+var loupeActive=false,loupeMap=null;
+function toggleLoupe(){
+  loupeActive=!loupeActive;
+  document.getElementById('tool-loupe').classList.toggle('active',loupeActive);
+  var el=document.getElementById('loupe');
+  if(isMobile()&&mobToolbarOpen){mobToolbarOpen=false;document.getElementById('toolbar').classList.remove('mob-open');document.getElementById('mob-toggle').classList.remove('open')}
+  if(loupeActive){el.style.display='block';initLoupeMap()}
+  else{el.style.display='none';destroyLoupeMap()}
+}
+
+function initLoupeMap(){
+  if(loupeMap)return;
+  var div=document.createElement('div');
+  div.style.cssText='width:180px;height:180px;border-radius:50%;overflow:hidden';
+  var inner=document.getElementById('loupe-inner');
+  inner.innerHTML='';inner.appendChild(div);
+  loupeMap=L.map(div,{center:center,zoom:map.getZoom()+2,zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,touchZoom:false,doubleClickZoom:false,keyboard:false,boxZoom:false,tap:false});
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{minZoom:13,maxZoom:23,maxNativeZoom:19}).addTo(loupeMap);
+  var f=FLIGHTS[currentFlightIdx];
+  L.tileLayer(tileUrl(f.folder),{tms:0,opacity:.9,minZoom:15,maxZoom:23,maxNativeZoom:21,bounds:L.latLngBounds(f.bounds[0],f.bounds[1])}).addTo(loupeMap);
+}
+function destroyLoupeMap(){if(loupeMap){loupeMap.remove();loupeMap=null;document.getElementById('loupe-inner').innerHTML=''}}
+
+map.on('mousemove',function(e){if(!loupeActive||!loupeMap)return;var pt=map.latLngToContainerPoint(e.latlng);document.getElementById('loupe').style.left=(pt.x+30)+'px';document.getElementById('loupe').style.top=(pt.y-90)+'px';loupeMap.setView(e.latlng,map.getZoom()+2,{animate:false})});
+map.on('zoomend',function(){if(loupeActive&&loupeMap)loupeMap.setView(map.getCenter(),map.getZoom()+2,{animate:false})});
+map.on('move',function(){if(loupeActive&&loupeMap&&isMobile()){document.getElementById('loupe').style.left='50%';document.getElementById('loupe').style.top='110px';document.getElementById('loupe').style.transform='translateX(-50%)';loupeMap.setView(map.getCenter(),map.getZoom()+2,{animate:false})}});
+
+// ============================================================
+// REPORT
+// ============================================================
+function showReport(){var c=document.getElementById('rpc');
+if(isMobile()&&mobToolbarOpen){mobToolbarOpen=false;document.getElementById('toolbar').classList.remove('mob-open');document.getElementById('mob-toggle').classList.remove('open')}
+var f=FLIGHTS[currentFlightIdx];
+document.getElementById('rp-sub').textContent='SKYNEX Media \u2014 Marlboro Township \u2014 '+f.date;
+if(!annotations.length){c.innerHTML='<div style="color:rgba(255,255,255,.4);font-size:12px;padding:16px 0;text-align:center">No annotations yet.<br>Use the tools to add measurements.</div>'}
+else{var h='',types={};annotations.forEach(function(a){if(!types[a.type])types[a.type]=[];types[a.type].push(a)});for(var t in types){h+='<div class="rp-sec"><div class="rp-st">'+t+'s ('+types[t].length+')</div>';types[t].forEach(function(a,i){h+='<div class="rp-row"><span class="rk">#'+(i+1)+'</span><span class="rv">'+esc(a.value)+'</span></div>'});h+='</div>'}c.innerHTML=h}
+document.getElementById('rp').style.display='block'}
+function hideReport(){document.getElementById('rp').style.display='none'}
+
+function copyReport(){var f=FLIGHTS[currentFlightIdx];var t='SKYNEX Media \u2014 Annotation Report\nMarlboro Township \u2014 '+f.date+'\n\n';annotations.forEach(function(a,i){t+=(i+1)+'. ['+a.type+'] '+a.value;if(a.coords[0])t+=' @ '+a.coords[0].lat.toFixed(6)+', '+a.coords[0].lng.toFixed(6);t+='\n'});t+='\nGenerated by SKYNEX Media Interactive Viewer';navigator.clipboard.writeText(t).then(function(){var b=document.querySelector('.btn-cp');b.textContent='Copied!';setTimeout(function(){b.textContent='Copy Text'},2000)})}
+
+function printReport(){var f=FLIGHTS[currentFlightIdx];var t='<html><head><title>SKYNEX Media \u2014 Annotation Report</title><style>body{font-family:Segoe UI,sans-serif;padding:40px;color:#222;max-width:700px;margin:0 auto}h1{font-size:18px;color:#B8860B;border-bottom:2px solid #B8860B;padding-bottom:8px}h2{font-size:14px;color:#666;margin-top:4px}.sec{margin:20px 0}.st{font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #eee;padding-bottom:4px;margin-bottom:8px}.row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;border-bottom:1px solid #f5f5f5}.rk{color:#888}.rv{font-family:Consolas,monospace}.ft{margin-top:30px;padding-top:12px;border-top:1px solid #eee;font-size:11px;color:#aaa}@media print{body{padding:20px}}</style></head><body>';
+t+='<h1>SKYNEX Media</h1><h2>Annotation Report \u2014 Marlboro Township \u2014 '+f.date+'</h2>';var types={};annotations.forEach(function(a){if(!types[a.type])types[a.type]=[];types[a.type].push(a)});for(var ty in types){t+='<div class="sec"><div class="st">'+ty+'s ('+types[ty].length+')</div>';types[ty].forEach(function(a,i){t+='<div class="row"><span class="rk">#'+(i+1)+'</span><span class="rv">'+esc(a.value)+'</span></div>'});t+='</div>'}
+t+='<div class="ft">Generated by SKYNEX Media Interactive Viewer \u2014 skynexmedia.com</div></body></html>';var w=window.open('','_blank');w.document.write(t);w.document.close();w.print()}
+
+// ============================================================
+// PEN / FREEHAND DRAW
+// ============================================================
+var penColor = '#F4B400';
+var penWidth = 3;
+var drawCanvas = document.getElementById('draw-canvas');
+var drawCtx = drawCanvas.getContext('2d');
+var isDrawing = false;
+var penStrokes = []; // array of {points, color, width}
+var currentStroke = null;
+
+function resizeCanvas(){
+  drawCanvas.width = window.innerWidth;
+  drawCanvas.height = window.innerHeight;
+  redrawCanvas();
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function setPenColor(c, el){
+  penColor = c;
+  document.querySelectorAll('.pen-color').forEach(function(d){ d.classList.remove('active') });
+  el.classList.add('active');
+}
+
+function redrawCanvas(){
+  drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+  penStrokes.forEach(function(s){
+    if(s.points.length < 2) return;
+    drawCtx.beginPath();
+    drawCtx.strokeStyle = s.color;
+    drawCtx.lineWidth = s.width;
+    drawCtx.lineCap = 'round';
+    drawCtx.lineJoin = 'round';
+    drawCtx.moveTo(s.points[0].x, s.points[0].y);
+    for(var i = 1; i < s.points.length; i++){
+      drawCtx.lineTo(s.points[i].x, s.points[i].y);
+    }
+    drawCtx.stroke();
+  });
+}
+
+// Canvas drawing events
+drawCanvas.addEventListener('mousedown', function(e){
+  if(currentTool !== 'pen') return;
+  isDrawing = true;
+  currentStroke = { points: [{x: e.clientX, y: e.clientY}], color: penColor, width: penWidth };
+});
+
+drawCanvas.addEventListener('mousemove', function(e){
+  if(!isDrawing || currentTool !== 'pen') return;
+  currentStroke.points.push({x: e.clientX, y: e.clientY});
+  // Draw current stroke live
+  drawCtx.beginPath();
+  drawCtx.strokeStyle = currentStroke.color;
+  drawCtx.lineWidth = currentStroke.width;
+  drawCtx.lineCap = 'round';
+  drawCtx.lineJoin = 'round';
+  var pts = currentStroke.points;
+  if(pts.length >= 2){
+    drawCtx.moveTo(pts[pts.length-2].x, pts[pts.length-2].y);
+    drawCtx.lineTo(pts[pts.length-1].x, pts[pts.length-1].y);
+    drawCtx.stroke();
+  }
+});
+
+drawCanvas.addEventListener('mouseup', function(){
+  if(!isDrawing) return;
+  isDrawing = false;
+  if(currentStroke && currentStroke.points.length >= 2){
+    penStrokes.push(currentStroke);
+  }
+  currentStroke = null;
+});
+
+// Touch events for mobile pen
+drawCanvas.addEventListener('touchstart', function(e){
+  if(currentTool !== 'pen') return;
+  e.preventDefault();
+  var t = e.touches[0];
+  isDrawing = true;
+  currentStroke = { points: [{x: t.clientX, y: t.clientY}], color: penColor, width: penWidth };
+}, {passive: false});
+
+drawCanvas.addEventListener('touchmove', function(e){
+  if(!isDrawing || currentTool !== 'pen') return;
+  e.preventDefault();
+  var t = e.touches[0];
+  currentStroke.points.push({x: t.clientX, y: t.clientY});
+  drawCtx.beginPath();
+  drawCtx.strokeStyle = currentStroke.color;
+  drawCtx.lineWidth = currentStroke.width;
+  drawCtx.lineCap = 'round';
+  drawCtx.lineJoin = 'round';
+  var pts = currentStroke.points;
+  if(pts.length >= 2){
+    drawCtx.moveTo(pts[pts.length-2].x, pts[pts.length-2].y);
+    drawCtx.lineTo(pts[pts.length-1].x, pts[pts.length-1].y);
+    drawCtx.stroke();
+  }
+}, {passive: false});
+
+drawCanvas.addEventListener('touchend', function(){
+  if(!isDrawing) return;
+  isDrawing = false;
+  if(currentStroke && currentStroke.points.length >= 2){
+    penStrokes.push(currentStroke);
+  }
+  currentStroke = null;
+});
+
+// Override activateTool to handle pen
+var _origActivate = activateTool;
+activateTool = function(t){
+  // Deactivate pen if switching away
+  if(currentTool === 'pen' && t !== 'pen'){
+    drawCanvas.classList.remove('active');
+    document.getElementById('pen-opts').style.display = 'none';
+  }
+  _origActivate(t);
+  if(t === 'pen'){
+    drawCanvas.classList.add('active');
+    document.getElementById('pen-opts').style.display = 'block';
+    showToast('Draw freely on the map. <b>ESC</b> to stop.');
+  }
+};
+
+var _origDeactivate = deactivateTool;
+deactivateTool = function(){
+  drawCanvas.classList.remove('active');
+  document.getElementById('pen-opts').style.display = 'none';
+  _origDeactivate();
+};
+
+// Override clearAll to also clear pen strokes
+var _origClear = clearAll;
+clearAll = function(){
+  _origClear();
+  penStrokes = [];
+  drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+};
+
+// Redraw pen strokes when map moves (strokes are screen-fixed, not geo-fixed)
+// This is intentional — pen marks are visual annotations on the screen view
+
+// ============================================================
+// SCREENSHOT
+// ============================================================
+var screenshotDataUrl = null;
+
+function takeScreenshot(){
+  // Use html2canvas approach via canvas compositing
+  var flash = document.getElementById('ss-flash');
+  flash.classList.add('flash');
+  setTimeout(function(){ flash.classList.remove('flash') }, 300);
+
+  // Capture the map container + canvas overlay
+  var mapEl = document.getElementById('map');
+  var rect = mapEl.getBoundingClientRect();
+
+  // Create composite canvas
+  var canvas = document.createElement('canvas');
+  var scale = window.devicePixelRatio || 1;
+  canvas.width = rect.width * scale;
+  canvas.height = rect.height * scale;
+  var ctx = canvas.getContext('2d');
+  ctx.scale(scale, scale);
+
+  // We can't directly capture tile layers due to CORS
+  // Instead use leaflet's built-in method or a simpler approach
+  // Best approach for static sites: use dom-to-image or just capture visible area
+
+  // Fallback: capture the draw canvas + create a branded export
+  // For tiles, we'll capture what we can
+
+  try {
+    // Try to capture map tiles using canvas
+    var mapCanvas = mapEl.querySelector('canvas');
+    if(mapCanvas){
+      ctx.drawImage(mapCanvas, 0, 0, rect.width, rect.height);
+    } else {
+      // Leaflet uses img tiles, not canvas — fill with dark bg
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, rect.width, rect.height);
+    }
+  } catch(e){
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(0, 0, rect.width, rect.height);
+  }
+
+  // Draw pen strokes on top
+  penStrokes.forEach(function(s){
+    if(s.points.length < 2) return;
+    ctx.beginPath();
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = s.width;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.moveTo(s.points[0].x - rect.left, s.points[0].y - rect.top);
+    for(var i = 1; i < s.points.length; i++){
+      ctx.lineTo(s.points[i].x - rect.left, s.points[i].y - rect.top);
+    }
+    ctx.stroke();
+  });
+
+  // Add SKYNEX branding bar at bottom
+  var barH = 36;
+  ctx.fillStyle = 'rgba(10,10,10,0.9)';
+  ctx.fillRect(0, rect.height - barH, rect.width, barH);
+
+  ctx.fillStyle = '#F4B400';
+  ctx.font = 'bold 12px Arial';
+  ctx.fillText('SKYNEX Media', 12, rect.height - 14);
+
+  var f = FLIGHTS[currentFlightIdx];
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.font = '10px Arial';
+  ctx.fillText(f.date + '  |  Marlboro Township, NJ', 120, rect.height - 14);
+
+  // Coordinates
+  var c = map.getCenter();
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.font = '10px Consolas';
+  var coordText = c.lat.toFixed(6) + '\u00b0N, ' + Math.abs(c.lng).toFixed(6) + '\u00b0W';
+  ctx.fillText(coordText, rect.width - 200, rect.height - 14);
+
+  screenshotDataUrl = canvas.toDataURL('image/png');
+
+  // Show preview
+  document.getElementById('ss-img').src = screenshotDataUrl;
+  document.getElementById('ss-preview').style.display = 'block';
+}
+
+function downloadScreenshot(){
+  if(!screenshotDataUrl) return;
+  var f = FLIGHTS[currentFlightIdx];
+  var link = document.createElement('a');
+  link.download = 'SKYNEX_' + f.id + '_screenshot.png';
+  link.href = screenshotDataUrl;
+  link.click();
+}
+
+function copyScreenshot(){
+  if(!screenshotDataUrl) return;
+  // Convert dataURL to blob and copy to clipboard
+  fetch(screenshotDataUrl).then(function(r){ return r.blob() }).then(function(blob){
+    var item = new ClipboardItem({'image/png': blob});
+    navigator.clipboard.write([item]).then(function(){
+      var btns = document.querySelectorAll('.screenshot-preview .btn-cp');
+      if(btns.length){btns[0].textContent='Copied!';setTimeout(function(){btns[0].textContent='Copy'},2000)}
+    });
+  }).catch(function(){
+    // Fallback — just download
+    downloadScreenshot();
+  });
+}
+
+// ============================================================
+// PRINT MAP
+// ============================================================
+function printMap(){
+  var f = FLIGHTS[currentFlightIdx];
+  var c = map.getCenter();
+  var z = map.getZoom();
+
+  var win = window.open('', '_blank');
+  var html = '<html><head><title>SKYNEX Media \u2014 Map Print</title>';
+  html += '<style>';
+  html += 'body{margin:0;padding:30px;font-family:Segoe UI,Arial,sans-serif;color:#222}';
+  html += '.header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #B8860B;padding-bottom:10px;margin-bottom:20px}';
+  html += '.logo-text{font-size:20px;font-weight:bold;color:#B8860B;letter-spacing:2px}';
+  html += '.meta{font-size:11px;color:#888;text-align:right;line-height:1.5}';
+  html += '.map-frame{border:1px solid #ddd;background:#f5f5f5;padding:8px;text-align:center;margin-bottom:20px}';
+  html += '.map-frame img{max-width:100%;border:1px solid #ccc}';
+  html += '.info-row{display:flex;justify-content:space-between;font-size:12px;color:#666;margin-bottom:6px}';
+  html += '.info-row b{color:#333}';
+  html += '.footer{margin-top:30px;padding-top:10px;border-top:1px solid #ddd;font-size:10px;color:#aaa;text-align:center}';
+  html += '.annotations{margin-top:20px}';
+  html += '.ann-title{font-size:13px;font-weight:bold;color:#B8860B;border-bottom:1px solid #eee;padding-bottom:4px;margin-bottom:8px}';
+  html += '.ann-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid #f5f5f5}';
+  html += '.ann-row .rk{color:#888}';
+  html += '.ann-row .rv{font-family:Consolas,monospace;color:#333}';
+  html += '@media print{body{padding:15px}}';
+  html += '</style></head><body>';
+
+  html += '<div class="header">';
+  html += '<div class="logo-text">SKYNEX MEDIA</div>';
+  html += '<div class="meta">Site Map Print<br>' + f.date + '<br>Marlboro Township, NJ</div>';
+  html += '</div>';
+
+  // Map image
+  if(screenshotDataUrl){
+    html += '<div class="map-frame"><img src="' + screenshotDataUrl + '"></div>';
+  } else {
+    html += '<div class="map-frame" style="padding:60px;color:#999;font-size:14px">Use the Screenshot tool first to capture the current map view, then Print.</div>';
+  }
+
+  // Map info
+  html += '<div class="info-row"><span><b>Center:</b> ' + c.lat.toFixed(6) + '\u00b0N, ' + Math.abs(c.lng).toFixed(6) + '\u00b0W</span><span><b>Zoom:</b> ' + z + '</span></div>';
+  html += '<div class="info-row"><span><b>Flight Date:</b> ' + f.date + '</span><span><b>Ortho:</b> ' + f.label + '</span></div>';
+
+  // Annotations if any
+  if(annotations.length > 0){
+    html += '<div class="annotations"><div class="ann-title">Annotations (' + annotations.length + ')</div>';
+    annotations.forEach(function(a, i){
+      html += '<div class="ann-row"><span class="rk">[' + a.type + ']</span><span class="rv">' + esc(a.value) + '</span></div>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div class="footer">Generated by SKYNEX Media Interactive Viewer \u2014 skynexmedia.com</div>';
+  html += '</body></html>';
+
+  win.document.write(html);
+  win.document.close();
+  setTimeout(function(){ win.print() }, 500);
+}
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(currentTool)deactivateTool();if(loupeActive){loupeActive=false;document.getElementById('tool-loupe').classList.remove('active');document.getElementById('loupe').style.display='none';destroyLoupeMap()}document.getElementById('ni').style.display='none';document.getElementById('pen-opts').style.display='none';document.getElementById('ss-preview').style.display='none';drawCanvas.classList.remove('active');hideReport();doneBtn.style.display='none'}});
+</script><div style="display: none; position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%); background: rgb(244, 180, 0); color: rgb(10, 10, 10); font-weight: 700; font-size: 14px; padding: 10px 28px; border-radius: 8px; z-index: 1001; cursor: pointer; box-shadow: rgba(0, 0, 0, 0.4) 0px 4px 16px; -webkit-tap-highlight-color: transparent;">Done ✓</div>
+
+
+</body></html>
