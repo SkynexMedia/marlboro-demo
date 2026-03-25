@@ -9,9 +9,8 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<!-- Leaflet Measure -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet-measure@3.1.0/dist/leaflet-measure.css" />
-<script src="https://unpkg.com/leaflet-measure@3.1.0/dist/leaflet-measure.js"></script>
+<!-- Leaflet Side-by-Side -->
+<script src="https://unpkg.com/leaflet-side-by-side@2.0.0/index.js"></script>
 
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -100,6 +99,80 @@
     border-radius: 3px;
   }
 
+  /* === TOOLBAR === */
+  .toolbar {
+    position: absolute;
+    top: 56px;
+    left: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 1000;
+  }
+
+  .tool-btn {
+    width: 36px;
+    height: 36px;
+    background: rgba(10,10,10,0.9);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    transition: all 0.15s ease;
+    user-select: none;
+    position: relative;
+  }
+
+  .tool-btn:hover {
+    background: rgba(30,30,30,0.95);
+    color: #F4B400;
+  }
+
+  .tool-btn.active {
+    background: rgba(244,180,0,0.15);
+    border-color: rgba(244,180,0,0.4);
+    color: #F4B400;
+  }
+
+  .tool-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    stroke: currentColor;
+    stroke-width: 0;
+  }
+
+  .tool-btn .tool-tip {
+    display: none;
+    position: absolute;
+    left: 42px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(10,10,10,0.95);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .tool-btn:hover .tool-tip {
+    display: block;
+  }
+
+  .tool-divider {
+    height: 1px;
+    width: 36px;
+    background: rgba(255,255,255,0.06);
+    margin: 4px 0;
+  }
+
   /* === LAYER PANEL === */
   .layer-panel {
     position: absolute;
@@ -112,7 +185,7 @@
     border-radius: 6px;
     padding: 12px 14px;
     z-index: 1000;
-    min-width: 180px;
+    min-width: 190px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
   }
 
@@ -223,6 +296,118 @@
     text-align: right;
   }
 
+  /* === MEASUREMENT RESULTS === */
+  .measure-result {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(244,180,0,0.3);
+    border-radius: 6px;
+    padding: 10px 18px;
+    z-index: 1000;
+    display: none;
+    text-align: center;
+    min-width: 200px;
+  }
+
+  .measure-result .result-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #F4B400;
+    font-family: 'Consolas', 'SF Mono', monospace;
+  }
+
+  .measure-result .result-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  .measure-result .result-close {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.3);
+    font-size: 14px;
+  }
+
+  .measure-result .result-close:hover {
+    color: #fff;
+  }
+
+  /* === COMPARE MODE === */
+  .compare-labels {
+    display: none;
+    z-index: 999;
+  }
+
+  .compare-label {
+    position: absolute;
+    top: 52px;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 5px 10px;
+    z-index: 999;
+  }
+
+  .compare-label-left {
+    left: 12px;
+  }
+
+  .compare-label-right {
+    right: 12px;
+  }
+
+  .compare-date {
+    font-size: 12px;
+    font-weight: 600;
+    color: #F4B400;
+  }
+
+  .compare-sublabel {
+    font-size: 9px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* === DATE STAMP === */
+  .date-stamp {
+    position: absolute;
+    top: 52px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10,10,10,0.8);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    padding: 4px 12px;
+    z-index: 998;
+    text-align: center;
+  }
+
+  .date-stamp-text {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.3px;
+  }
+
+  .date-stamp-text strong {
+    color: rgba(244,180,0,0.8);
+    font-weight: 600;
+  }
+
   /* === COORDINATES DISPLAY === */
   .coord-display {
     position: absolute;
@@ -241,27 +426,27 @@
     letter-spacing: 0.3px;
   }
 
-  /* === MEASURE TOOL OVERRIDES === */
-  .leaflet-control-measure {
-    border: 1px solid rgba(255,255,255,0.1) !important;
-    border-radius: 5px !important;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.4) !important;
+  /* === INSTRUCTIONS TOAST === */
+  .toast {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(244,180,0,0.2);
+    border-radius: 6px;
+    padding: 8px 16px;
+    z-index: 1001;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    display: none;
+    white-space: nowrap;
   }
 
-  .leaflet-control-measure .leaflet-control-measure-toggle {
-    background-color: rgba(10,10,10,0.9) !important;
-    border-radius: 5px !important;
-    width: 34px !important;
-    height: 34px !important;
-  }
-
-  .leaflet-control-measure .leaflet-control-measure-toggle:hover {
-    background-color: rgba(30,30,30,0.95) !important;
-  }
-
-  .leaflet-control-measure .startprompt h3,
-  .leaflet-control-measure .measureprompt h3 {
-    color: #F4B400 !important;
+  .toast .toast-key {
+    color: #F4B400;
+    font-weight: 600;
   }
 
   /* === ZOOM CONTROL OVERRIDES === */
@@ -269,9 +454,9 @@
     background: rgba(10,10,10,0.9) !important;
     color: rgba(255,255,255,0.7) !important;
     border-color: rgba(255,255,255,0.1) !important;
-    width: 34px !important;
-    height: 34px !important;
-    line-height: 34px !important;
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
     font-size: 16px !important;
   }
 
@@ -285,6 +470,16 @@
     border-radius: 5px !important;
     overflow: hidden;
     box-shadow: 0 2px 12px rgba(0,0,0,0.4) !important;
+    margin-top: 0 !important;
+  }
+
+  /* === SCALE BAR === */
+  .leaflet-control-scale-line {
+    background: rgba(10,10,10,0.8) !important;
+    color: rgba(255,255,255,0.6) !important;
+    border-color: rgba(255,255,255,0.3) !important;
+    font-size: 10px !important;
+    padding: 2px 6px !important;
   }
 
   /* === ATTRIBUTION === */
@@ -298,6 +493,77 @@
     color: rgba(244,180,0,0.5) !important;
   }
 
+  /* === SIDE BY SIDE SLIDER === */
+  .leaflet-sbs-range {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    height: 100%;
+    cursor: col-resize;
+  }
+
+  .leaflet-sbs-divider {
+    background: #F4B400 !important;
+    width: 3px !important;
+  }
+
+  .leaflet-sbs-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #F4B400;
+    border: 3px solid #0a0a0a;
+    cursor: col-resize;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  /* === ANNOTATION POPUP === */
+  .leaflet-popup-content-wrapper {
+    background: rgba(10,10,10,0.92) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    border-radius: 6px !important;
+    color: #e0e0e0 !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
+  }
+
+  .leaflet-popup-tip {
+    background: rgba(10,10,10,0.92) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+  }
+
+  .leaflet-popup-content {
+    margin: 10px 14px !important;
+    font-size: 12px !important;
+  }
+
+  .pin-popup-title {
+    color: #F4B400;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .pin-popup-coords {
+    font-family: 'Consolas', 'SF Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Measurement line/polygon styles */
+  .measure-vertex {
+    width: 10px !important;
+    height: 10px !important;
+    margin-left: -5px !important;
+    margin-top: -5px !important;
+    background: #F4B400 !important;
+    border: 2px solid #0a0a0a !important;
+    border-radius: 50% !important;
+  }
+
   /* === MOBILE === */
   @media (max-width: 600px) {
     .brand-bar { height: 38px; padding: 0 10px; }
@@ -305,8 +571,16 @@
     .brand-project { display: none; }
     .brand-sep { display: none; }
     .brand-badge { font-size: 8px; padding: 2px 6px; }
+    .toolbar { top: 48px; left: 8px; }
+    .tool-btn { width: 32px; height: 32px; }
+    .tool-btn svg { width: 16px; height: 16px; }
     .layer-panel { top: 48px; right: 8px; min-width: 160px; padding: 10px 12px; }
     .coord-display { font-size: 10px; bottom: 6px; left: 8px; }
+    .date-stamp { top: 44px; padding: 3px 8px; }
+    .date-stamp-text { font-size: 10px; }
+    .measure-result { bottom: 35px; min-width: 160px; padding: 8px 14px; }
+    .measure-result .result-value { font-size: 16px; }
+    .toast { bottom: 35px; font-size: 11px; padding: 6px 12px; }
   }
 </style>
 </head>
@@ -323,8 +597,45 @@
   <span class="brand-badge">Interactive Viewer</span>
 </div>
 
+<!-- TOOLBAR -->
+<div class="toolbar" id="toolbar">
+  <!-- Distance -->
+  <div class="tool-btn" id="tool-distance" onclick="activateTool('distance')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="20" x2="20" y2="4"/><polyline points="14,4 20,4 20,10" fill="none"/><circle cx="4" cy="20" r="2" fill="currentColor" stroke="none"/></svg>
+    <span class="tool-tip">Measure Distance</span>
+  </div>
+
+  <!-- Area -->
+  <div class="tool-btn" id="tool-area" onclick="activateTool('area')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3,18 9,3 21,6 18,21" fill="rgba(244,180,0,0.15)"/></svg>
+    <span class="tool-tip">Measure Area</span>
+  </div>
+
+  <!-- Drop Pin -->
+  <div class="tool-btn" id="tool-pin" onclick="activateTool('pin')">
+    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
+    <span class="tool-tip">Drop Pin</span>
+  </div>
+
+  <div class="tool-divider"></div>
+
+  <!-- Compare -->
+  <div class="tool-btn" id="tool-compare" onclick="toggleCompare()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><polyline points="8,7 12,3 16,7" fill="none"/><polyline points="8,17 12,21 16,17" fill="none"/><rect x="2" y="6" width="8" height="12" rx="1" fill="rgba(244,180,0,0.1)" stroke="currentColor"/><rect x="14" y="6" width="8" height="12" rx="1" fill="rgba(255,255,255,0.05)" stroke="currentColor"/></svg>
+    <span class="tool-tip">Compare Mode</span>
+  </div>
+
+  <div class="tool-divider"></div>
+
+  <!-- Clear All -->
+  <div class="tool-btn" id="tool-clear" onclick="clearAll()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    <span class="tool-tip">Clear All</span>
+  </div>
+</div>
+
 <!-- LAYER PANEL -->
-<div class="layer-panel">
+<div class="layer-panel" id="layer-panel">
   <div class="layer-title">Layers</div>
 
   <div class="layer-item" onclick="toggleLayer('ortho')">
@@ -360,6 +671,33 @@
   </div>
 </div>
 
+<!-- DATE STAMP -->
+<div class="date-stamp" id="date-stamp">
+  <div class="date-stamp-text">Flight Date: <strong>February 21, 2026</strong></div>
+</div>
+
+<!-- COMPARE LABELS -->
+<div class="compare-labels" id="compare-labels">
+  <div class="compare-label compare-label-left">
+    <div class="compare-sublabel">Orthomosaic</div>
+    <div class="compare-date">Feb 21, 2026</div>
+  </div>
+  <div class="compare-label compare-label-right">
+    <div class="compare-sublabel">Satellite</div>
+    <div class="compare-date">Esri Basemap</div>
+  </div>
+</div>
+
+<!-- MEASUREMENT RESULT -->
+<div class="measure-result" id="measure-result">
+  <span class="result-close" onclick="hideMeasureResult()">&times;</span>
+  <div class="result-value" id="result-value">0.00 ft</div>
+  <div class="result-label" id="result-label">Distance</div>
+</div>
+
+<!-- INSTRUCTION TOAST -->
+<div class="toast" id="toast"></div>
+
 <!-- COORDINATE DISPLAY -->
 <div class="coord-display" id="coords">40.3186°N, 74.2439°W</div>
 
@@ -367,32 +705,56 @@
 <div id="map"></div>
 
 <script>
-// === BOUNDS from gdal2tiles ===
+// =============================================
+// CONFIG
+// =============================================
+var FLIGHT_DATE = 'February 21, 2026';
+
+// Bounds from gdal2tiles
 var sw = [40.31681787617521, -74.24589198549170];
 var ne = [40.32047817458884, -74.24189684928949];
-// Note: gdal2tiles swapped lon values — corrected here
 var bounds = L.latLngBounds(
   [Math.min(sw[0], ne[0]), Math.min(sw[1], ne[1])],
   [Math.max(sw[0], ne[0]), Math.max(sw[1], ne[1])]
 );
 var center = bounds.getCenter();
 
-// === BASE LAYERS ===
-
-// Black/empty background
-var blackBg = L.tileLayer('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', {
+// =============================================
+// MAP INIT
+// =============================================
+var map = L.map('map', {
+  center: center,
+  zoom: 18,
   minZoom: 13,
-  maxZoom: 21
+  maxZoom: 21,
+  zoomControl: false,
+  attributionControl: true
 });
+
+// Zoom control top-left, below toolbar
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+// Scale bar
+L.control.scale({ position: 'bottomright', imperial: true, metric: false, maxWidth: 150 }).addTo(map);
+
+// =============================================
+// LAYERS
+// =============================================
+
+// Black background
+var blackBg = L.tileLayer('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', {
+  minZoom: 13, maxZoom: 21
+});
+blackBg.addTo(map);
 
 // Satellite (Esri)
 var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
   attribution: '&copy; Esri',
-  minZoom: 13,
-  maxZoom: 21
+  minZoom: 13, maxZoom: 21
 });
+satellite.addTo(map);
 
-// === ORTHO OVERLAY ===
+// Ortho
 var orthoLayer = L.tileLayer('./{z}/{x}/{y}.png', {
   tms: 0,
   opacity: 0.9,
@@ -400,97 +762,320 @@ var orthoLayer = L.tileLayer('./{z}/{x}/{y}.png', {
   maxZoom: 21,
   bounds: bounds
 });
+orthoLayer.addTo(map);
 
-// === MAP INIT ===
-var map = L.map('map', {
-  center: center,
-  zoom: 18,
-  minZoom: 13,
-  maxZoom: 21,
-  layers: [blackBg, satellite, orthoLayer],
-  zoomControl: false,
-  attributionControl: true
-});
-
-// Zoom control — top left under brand bar
-L.control.zoom({ position: 'topleft' }).addTo(map);
-
-// Fit to ortho bounds
+// Fit to ortho
 map.fitBounds(bounds, { padding: [60, 60] });
 
-// === MEASURE TOOL ===
-var measureControl = L.control.measure({
-  position: 'topleft',
-  primaryLengthUnit: 'feet',
-  secondaryLengthUnit: 'miles',
-  primaryAreaUnit: 'sqfeet',
-  secondaryAreaUnit: 'acres',
-  activeColor: '#F4B400',
-  completedColor: '#F4B400'
-});
-measureControl.addTo(map);
+// =============================================
+// LAYER TOGGLES
+// =============================================
+var layerState = { ortho: true, satellite: true, contours: false, gcps: false };
 
-// === COORDINATE TRACKER ===
+function toggleLayer(id) {
+  if (id === 'contours' || id === 'gcps') return;
+  var checkEl = document.getElementById('check-' + id);
+  layerState[id] = !layerState[id];
+  checkEl.classList.toggle('active', layerState[id]);
+
+  if (id === 'ortho') {
+    layerState.ortho ? map.addLayer(orthoLayer) : map.removeLayer(orthoLayer);
+  }
+  if (id === 'satellite') {
+    layerState.satellite ? map.addLayer(satellite) : map.removeLayer(satellite);
+  }
+}
+
+function setOrthoOpacity(val) {
+  orthoLayer.setOpacity(val / 100);
+  document.getElementById('opacity-val').textContent = val + '%';
+}
+
+// =============================================
+// COORDINATE TRACKER
+// =============================================
 var coordEl = document.getElementById('coords');
 map.on('mousemove', function(e) {
-  var lat = e.latlng.lat.toFixed(6);
-  var lng = Math.abs(e.latlng.lng).toFixed(6);
-  coordEl.textContent = lat + '°N, ' + lng + '°W';
+  coordEl.textContent = e.latlng.lat.toFixed(6) + '°N, ' + Math.abs(e.latlng.lng).toFixed(6) + '°W';
 });
-
-// Mobile: update on map move instead
 map.on('moveend', function() {
   var c = map.getCenter();
   coordEl.textContent = c.lat.toFixed(6) + '°N, ' + Math.abs(c.lng).toFixed(6) + '°W';
 });
 
-// === LAYER TOGGLE ===
-var layerState = {
-  ortho: true,
-  satellite: true,
-  contours: false,
-  gcps: false
-};
+// =============================================
+// MEASUREMENT TOOLS
+// =============================================
+var currentTool = null;
+var measurePoints = [];
+var measureMarkers = [];
+var measureLines = [];
+var measurePolygons = [];
+var pinMarkers = [];
+var tempLine = null;
 
-function toggleLayer(id) {
-  var checkEl = document.getElementById('check-' + id);
-
-  if (id === 'contours' || id === 'gcps') {
-    // Coming soon — no toggle
+function activateTool(tool) {
+  // Deactivate if same tool clicked
+  if (currentTool === tool) {
+    deactivateTool();
     return;
   }
 
-  layerState[id] = !layerState[id];
+  deactivateTool();
+  currentTool = tool;
+  document.getElementById('tool-' + tool).classList.add('active');
+  map.getContainer().style.cursor = 'crosshair';
 
-  if (layerState[id]) {
-    checkEl.classList.add('active');
+  if (tool === 'distance') {
+    showToast('Click points to measure distance. <span class="toast-key">Double-click</span> to finish.');
+  } else if (tool === 'area') {
+    showToast('Click points to draw area. <span class="toast-key">Double-click</span> to close & measure.');
+  } else if (tool === 'pin') {
+    showToast('Click on the map to <span class="toast-key">drop a pin</span>.');
+  }
+}
+
+function deactivateTool() {
+  if (currentTool) {
+    document.getElementById('tool-' + currentTool).classList.remove('active');
+  }
+  currentTool = null;
+  measurePoints = [];
+  if (tempLine) { map.removeLayer(tempLine); tempLine = null; }
+  map.getContainer().style.cursor = '';
+  hideToast();
+}
+
+// Map click handler
+map.on('click', function(e) {
+  if (!currentTool) return;
+
+  if (currentTool === 'pin') {
+    dropPin(e.latlng);
+    deactivateTool();
+    return;
+  }
+
+  if (currentTool === 'distance' || currentTool === 'area') {
+    measurePoints.push(e.latlng);
+
+    // Add vertex marker
+    var marker = L.circleMarker(e.latlng, {
+      radius: 5,
+      color: '#0a0a0a',
+      fillColor: '#F4B400',
+      fillOpacity: 1,
+      weight: 2
+    }).addTo(map);
+    measureMarkers.push(marker);
+
+    // Draw connecting line
+    if (measurePoints.length > 1) {
+      var segment = L.polyline(
+        [measurePoints[measurePoints.length - 2], measurePoints[measurePoints.length - 1]],
+        { color: '#F4B400', weight: 2, dashArray: '6,6', opacity: 0.9 }
+      ).addTo(map);
+      measureLines.push(segment);
+    }
+  }
+});
+
+// Double click to finish
+map.on('dblclick', function(e) {
+  if (!currentTool) return;
+  L.DomEvent.stopPropagation(e);
+  L.DomEvent.preventDefault(e);
+
+  if (currentTool === 'distance' && measurePoints.length >= 2) {
+    finishDistance();
+  } else if (currentTool === 'area' && measurePoints.length >= 3) {
+    finishArea();
+  }
+});
+
+// Disable default double-click zoom
+map.doubleClickZoom.disable();
+
+function finishDistance() {
+  var totalFeet = 0;
+  for (var i = 1; i < measurePoints.length; i++) {
+    totalFeet += measurePoints[i-1].distanceTo(measurePoints[i]) * 3.28084;
+  }
+  showMeasureResult(formatDistance(totalFeet), 'Total Distance');
+  deactivateTool();
+}
+
+function finishArea() {
+  // Close the polygon visually
+  var closingLine = L.polyline(
+    [measurePoints[measurePoints.length - 1], measurePoints[0]],
+    { color: '#F4B400', weight: 2, dashArray: '6,6', opacity: 0.9 }
+  ).addTo(map);
+  measureLines.push(closingLine);
+
+  // Fill polygon
+  var polygon = L.polygon(measurePoints, {
+    color: '#F4B400',
+    fillColor: '#F4B400',
+    fillOpacity: 0.12,
+    weight: 2,
+    dashArray: '6,6'
+  }).addTo(map);
+  measurePolygons.push(polygon);
+
+  // Remove the individual line segments since polygon draws the outline
+  // Actually keep them for the dashed look
+
+  var sqMeters = calculatePolygonArea(measurePoints);
+  var sqFeet = sqMeters * 10.7639;
+  var acres = sqFeet / 43560;
+
+  var display = formatArea(sqFeet);
+  if (acres >= 0.1) {
+    display += ' (' + acres.toFixed(2) + ' ac)';
+  }
+
+  showMeasureResult(display, 'Area');
+  deactivateTool();
+}
+
+function calculatePolygonArea(latlngs) {
+  // Shoelace formula on projected coords
+  var area = 0;
+  var n = latlngs.length;
+  for (var i = 0; i < n; i++) {
+    var j = (i + 1) % n;
+    var p1 = map.project(latlngs[i], map.getZoom());
+    var p2 = map.project(latlngs[j], map.getZoom());
+    area += p1.x * p2.y;
+    area -= p2.x * p1.y;
+  }
+  area = Math.abs(area) / 2;
+
+  // Convert pixel area to meters
+  var metersPerPixel = 40075016.686 * Math.cos(center.lat * Math.PI / 180) / Math.pow(2, map.getZoom() + 8);
+  return area * metersPerPixel * metersPerPixel;
+}
+
+function dropPin(latlng) {
+  var pinIcon = L.divIcon({
+    className: '',
+    html: '<svg width="24" height="36" viewBox="0 0 24 36"><path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 24 12 24s12-15 12-24C24 5.37 18.63 0 12 0z" fill="#F4B400"/><circle cx="12" cy="12" r="5" fill="#0a0a0a"/></svg>',
+    iconSize: [24, 36],
+    iconAnchor: [12, 36],
+    popupAnchor: [0, -36]
+  });
+
+  var pin = L.marker(latlng, { icon: pinIcon }).addTo(map);
+  pin.bindPopup(
+    '<div class="pin-popup-title">Pinned Location</div>' +
+    '<div class="pin-popup-coords">' + latlng.lat.toFixed(6) + '°N, ' + Math.abs(latlng.lng).toFixed(6) + '°W</div>'
+  ).openPopup();
+  pinMarkers.push(pin);
+}
+
+function formatDistance(feet) {
+  if (feet >= 5280) {
+    return (feet / 5280).toFixed(2) + ' mi';
+  }
+  return feet.toFixed(1) + ' ft';
+}
+
+function formatArea(sqFeet) {
+  if (sqFeet >= 43560) {
+    return (sqFeet / 43560).toFixed(2) + ' ac';
+  }
+  return numberWithCommas(Math.round(sqFeet)) + ' sq ft';
+}
+
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function showMeasureResult(value, label) {
+  document.getElementById('result-value').textContent = value;
+  document.getElementById('result-label').textContent = label;
+  document.getElementById('measure-result').style.display = 'block';
+}
+
+function hideMeasureResult() {
+  document.getElementById('measure-result').style.display = 'none';
+}
+
+function showToast(html) {
+  var toast = document.getElementById('toast');
+  toast.innerHTML = html;
+  toast.style.display = 'block';
+}
+
+function hideToast() {
+  document.getElementById('toast').style.display = 'none';
+}
+
+function clearAll() {
+  // Clear measurements
+  measureMarkers.forEach(function(m) { map.removeLayer(m); });
+  measureLines.forEach(function(l) { map.removeLayer(l); });
+  measurePolygons.forEach(function(p) { map.removeLayer(p); });
+  pinMarkers.forEach(function(p) { map.removeLayer(p); });
+  measureMarkers = [];
+  measureLines = [];
+  measurePolygons = [];
+  pinMarkers = [];
+  measurePoints = [];
+  hideMeasureResult();
+  deactivateTool();
+}
+
+// =============================================
+// COMPARE MODE
+// =============================================
+var compareActive = false;
+var sideBySide = null;
+
+function toggleCompare() {
+  compareActive = !compareActive;
+  document.getElementById('tool-compare').classList.toggle('active', compareActive);
+
+  if (compareActive) {
+    // Enter compare mode
+    document.getElementById('compare-labels').style.display = 'block';
+    document.getElementById('date-stamp').style.display = 'none';
+    document.getElementById('layer-panel').style.display = 'none';
+
+    // Ensure both layers are on map
+    if (!map.hasLayer(satellite)) map.addLayer(satellite);
+    if (!map.hasLayer(orthoLayer)) map.addLayer(orthoLayer);
+
+    // Create side-by-side control
+    sideBySide = L.control.sideBySide(orthoLayer, satellite).addTo(map);
+
   } else {
-    checkEl.classList.remove('active');
-  }
+    // Exit compare mode
+    document.getElementById('compare-labels').style.display = 'none';
+    document.getElementById('date-stamp').style.display = 'block';
+    document.getElementById('layer-panel').style.display = 'block';
 
-  if (id === 'ortho') {
-    if (layerState.ortho) {
-      map.addLayer(orthoLayer);
-    } else {
-      map.removeLayer(orthoLayer);
-    }
-  }
-
-  if (id === 'satellite') {
-    if (layerState.satellite) {
-      map.addLayer(satellite);
-    } else {
-      map.removeLayer(satellite);
+    if (sideBySide) {
+      sideBySide.remove();
+      sideBySide = null;
     }
   }
 }
 
-// === OPACITY CONTROL ===
-function setOrthoOpacity(val) {
-  var opacity = val / 100;
-  orthoLayer.setOpacity(opacity);
-  document.getElementById('opacity-val').textContent = val + '%';
-}
+// =============================================
+// KEYBOARD SHORTCUT — ESC to cancel
+// =============================================
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (currentTool) {
+      deactivateTool();
+    }
+    if (compareActive) {
+      toggleCompare();
+    }
+  }
+});
 </script>
 
 </body>
