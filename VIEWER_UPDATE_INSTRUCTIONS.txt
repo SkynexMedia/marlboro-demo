@@ -1,0 +1,34 @@
+MARLBORO VIEWER UPDATE — Add CAD Site Plan Layer
+=================================================
+
+You need to make 2 changes to index.html and upload 1 file.
+
+FILE TO UPLOAD:
+  → Create folder: /cad/ in your GitHub repo root
+  → Upload marlboro_siteplan_cad.png into /cad/
+
+CHANGE 1 — Find this line (around line ~155):
+─────────────────────────────────────────────
+var CAD_LAYERS = [
+  // UNCOMMENT AND ADD YOUR CAD DRAWINGS:
+  // { id: 'site-plan', name: 'Site Plan', url: './cad/site-plan.png', color: '#ffffff' },
+
+REPLACE WITH:
+─────────────────────────────────────────────
+var CAD_LAYERS = [
+  { id: 'site-plan', name: 'Site Plan (Rt 79 & Stevenson)', url: './cad/marlboro_siteplan_cad.png', color: '#00DDFF', bounds: [[40.317724,-74.246742],[40.321244,-74.242759]] },
+
+
+CHANGE 2 — Find this line in the initCadLayers function:
+─────────────────────────────────────────────
+    cadLayerObjects[c.id] = L.imageOverlay(c.url, CAD_BOUNDS, {opacity: 0.7});
+
+REPLACE WITH:
+─────────────────────────────────────────────
+    cadLayerObjects[c.id] = L.imageOverlay(c.url, c.bounds || CAD_BOUNDS, {opacity: 0.7});
+
+
+That's it. Two lines changed, one file uploaded.
+After pushing to GitHub, Netlify auto-deploys. The site plan will 
+appear under "CAD Drawings" in the layer panel with a toggle and 
+opacity slider.
