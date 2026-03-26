@@ -330,7 +330,19 @@ body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-seri
 
   <div class="ld"></div>
 
-  <div class="li" onclick="toggleLayer('contours')"><div class="lc" id="check-contours"></div><span class="ll">Contour Lines</span><span class="ltag">coming soon</span></div>
+  <!-- ANALYSIS LAYERS — collapsible -->
+  <div class="cad-header" onclick="toggleAnalysisPanel()">
+    <div class="lt" style="margin-bottom:0;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+      Analysis Layers <span class="cad-arrow" id="analysis-arrow">&#9654;</span>
+    </div>
+  </div>
+  <div class="cad-body" id="analysis-body" style="display:none">
+    <div id="analysis-layers-list"></div>
+    <div class="cad-empty" id="analysis-empty" style="font-size:10px;color:rgba(255,255,255,.3);padding:6px 0;font-style:italic">No analysis layers loaded</div>
+  </div>
+
+  <div class="ld"></div>
+
   <div class="li" onclick="toggleLayer('gcps')"><div class="lc" id="check-gcps"></div><span class="ll">GCP Markers</span><span class="ltag">coming soon</span></div>
 </div>
 
@@ -444,6 +456,35 @@ var CAD_LAYERS = [
 ];
 
 // ============================================================
+// ANALYSIS LAYERS — TILED OVERLAYS (DEM, Contours, Hillshade, etc.)
+// Two types supported:
+//   type: 'tiles' — tiled rasters (DEM heatmap, hillshade, slope)
+//                    Generate with gdal2tiles.py, put in subfolder
+//   type: 'geojson' — vector overlays (contour lines, boundaries)
+//                      Convert DXF to GeoJSON with ogr2ogr
+//   type: 'image' — single image overlay (like CAD, for quick overlays)
+//
+// GDAL commands to generate these:
+//   DEM Heatmap:  gdaldem color-relief dem.tif colors.txt dem_color.tif
+//                 gdalwarp -t_srs EPSG:3857 dem_color.tif dem_web.tif
+//                 gdal2tiles.py -z 15-21 --xyz dem_web.tif ./analysis/dem-heatmap
+//   Hillshade:    gdaldem hillshade dem.tif hillshade.tif -z 2
+//                 gdalwarp -t_srs EPSG:3857 hillshade.tif hs_web.tif
+//                 gdal2tiles.py -z 15-21 --xyz hs_web.tif ./analysis/hillshade
+//   Slope:        gdaldem slope dem.tif slope.tif
+//                 (apply color ramp, reproject, tile same as above)
+//   Contours:     ogr2ogr -f GeoJSON contours.geojson contours.dxf
+// ============================================================
+var ANALYSIS_LAYERS = [
+  { id: 'dem-heatmap', name: 'Elevation Heatmap', type: 'tiles',
+    url: './analysis/dem-heatmap/{z}/{x}/{y}.png', color: '#FF6B6B',
+    minZoom: 15, maxZoom: 21 },
+  { id: 'hillshade', name: 'Hillshade', type: 'tiles',
+    url: './analysis/hillshade/{z}/{x}/{y}.png', color: '#888888',
+    minZoom: 15, maxZoom: 21 },
+];
+
+// ============================================================
 // MAP INIT
 // ============================================================
 var currentFlightIdx = 0;
@@ -527,12 +568,105 @@ function setCadOp(id, v){
   document.getElementById('cad-opval-'+id).textContent = v + '%';
 }
 
+// ============================================================
+// ANALYSIS LAYERS INIT
+// ============================================================
+var analysisLayerObjects = {};
+var analysisLayerState = {};
+
+function initAnalysisLayers(){
+  var listEl = document.getElementById('analysis-layers-list');
+  var emptyEl = document.getElementById('analysis-empty');
+  listEl.innerHTML = '';
+
+  if(ANALYSIS_LAYERS.length === 0){
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  ANALYSIS_LAYERS.forEach(function(a){
+    analysisLayerState[a.id] = false;
+
+    if(a.type === 'tiles'){
+      analysisLayerObjects[a.id] = L.tileLayer(a.url, {
+        tms: 0, opacity: 0.7, minZoom: a.minZoom || 15, maxZoom: a.maxZoom || 21,
+        maxNativeZoom: a.maxZoom || 21, bounds: orthoBounds,
+        errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+      });
+    } else if(a.type === 'geojson'){
+      // GeoJSON layers load on first toggle
+      analysisLayerObjects[a.id] = null; // placeholder, loaded on demand
+    } else if(a.type === 'image'){
+      analysisLayerObjects[a.id] = L.imageOverlay(a.url, CAD_BOUNDS, {opacity: 0.7});
+    }
+
+    var item = document.createElement('div');
+    item.innerHTML =
+      '<div class="cad-layer-item" onclick="toggleAnalysisLayer(\''+a.id+'\')">' +
+        '<div class="cad-layer-check" id="analysis-check-'+a.id+'"></div>' +
+        '<div class="cad-color-dot" style="background:'+a.color+'"></div>' +
+        '<span class="cad-layer-name">'+a.name+'</span>' +
+      '</div>' +
+      '<div class="cad-opacity-row">' +
+        '<input type="range" class="oslider" min="0" max="100" value="70" oninput="setAnalysisOp(\''+a.id+'\',this.value)">' +
+        '<span class="oval" id="analysis-opval-'+a.id+'">70%</span>' +
+      '</div>';
+    listEl.appendChild(item);
+  });
+}
+initAnalysisLayers();
+
+function toggleAnalysisPanel(){
+  var body = document.getElementById('analysis-body');
+  var arrow = document.getElementById('analysis-arrow');
+  if(body.style.display === 'none'){
+    body.style.display = 'block';
+    arrow.classList.add('open');
+  } else {
+    body.style.display = 'none';
+    arrow.classList.remove('open');
+  }
+}
+
+function toggleAnalysisLayer(id){
+  var cfg = ANALYSIS_LAYERS.find(function(a){ return a.id === id; });
+  analysisLayerState[id] = !analysisLayerState[id];
+  document.getElementById('analysis-check-'+id).classList.toggle('active', analysisLayerState[id]);
+
+  if(analysisLayerState[id]){
+    if(cfg.type === 'geojson' && !analysisLayerObjects[id]){
+      // Load GeoJSON on first toggle
+      fetch(cfg.url).then(function(r){ return r.json(); }).then(function(data){
+        analysisLayerObjects[id] = L.geoJSON(data, {
+          style: { color: cfg.color, weight: cfg.weight || 1, opacity: 0.7, dashArray: cfg.dashArray || null, fillOpacity: 0 }
+        }).addTo(map);
+      }).catch(function(e){ console.error('Failed to load GeoJSON:', cfg.url, e); });
+    } else if(analysisLayerObjects[id]){
+      analysisLayerObjects[id].addTo(map);
+    }
+  } else {
+    if(analysisLayerObjects[id]) map.removeLayer(analysisLayerObjects[id]);
+  }
+}
+
+function setAnalysisOp(id, v){
+  if(!analysisLayerObjects[id]) return;
+  var cfg = ANALYSIS_LAYERS.find(function(a){ return a.id === id; });
+  if(cfg.type === 'geojson'){
+    analysisLayerObjects[id].setStyle({ opacity: v / 100 });
+  } else {
+    analysisLayerObjects[id].setOpacity(v / 100);
+  }
+  document.getElementById('analysis-opval-'+id).textContent = v + '%';
+}
+
 map.fitBounds(orthoBounds,{padding:[60,60]});
 
-var layerState = {ortho:true,satellite:true,contours:false,gcps:false};
+var layerState = {ortho:true,satellite:true,gcps:false};
 
 function toggleLayer(id){
-  if(id==='contours'||id==='gcps') return;
+  if(id==='gcps') return;
   layerState[id]=!layerState[id];
   document.getElementById('check-'+id).classList.toggle('active',layerState[id]);
   if(id==='ortho') layerState.ortho?map.addLayer(orthoLayer):map.removeLayer(orthoLayer);
@@ -707,7 +841,9 @@ function cancelNote(){document.getElementById('ni').style.display='none';documen
 // CLEAR
 function clearAll(){allDrawn.forEach(function(i){map.removeLayer(i)});allDrawn=[];annotations=[];deactivateTool();hideToast();document.getElementById('ni').style.display='none';doneBtn.style.display='none';
 // Reset CAD layers
-CAD_LAYERS.forEach(function(c){if(cadLayerState[c.id]){map.removeLayer(cadLayerObjects[c.id]);cadLayerState[c.id]=false;document.getElementById('cad-check-'+c.id).classList.remove('active')}})}
+CAD_LAYERS.forEach(function(c){if(cadLayerState[c.id]){map.removeLayer(cadLayerObjects[c.id]);cadLayerState[c.id]=false;document.getElementById('cad-check-'+c.id).classList.remove('active')}});
+// Reset Analysis layers
+ANALYSIS_LAYERS.forEach(function(a){if(analysisLayerState[a.id]&&analysisLayerObjects[a.id]){map.removeLayer(analysisLayerObjects[a.id]);analysisLayerState[a.id]=false;document.getElementById('analysis-check-'+a.id).classList.remove('active')}})}
 
 // ============================================================
 // COMPARE MODE
