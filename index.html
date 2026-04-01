@@ -6,7 +6,7 @@
 <title>SKYNEX Media — Site Viewer</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet-side-by-side@2.0.0/index.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/digidem/leaflet-side-by-side@2.0.0/leaflet-side-by-side.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#e0e0e0;overflow:hidden;height:100vh;height:100dvh;width:100vw;-webkit-tap-highlight-color:transparent}
@@ -178,6 +178,20 @@ body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-seri
 .loupe-crosshair::after{width:12px;height:1px;top:50%;left:0;transform:translateY(-50%)}
 .loupe-label{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:9px;color:rgba(244,180,0,.7);font-weight:600;letter-spacing:1px;white-space:nowrap;text-transform:uppercase}
 
+/* ===== CONTOUR COLOR SWITCHER ===== */
+.contour-colors{display:none;padding:2px 0 4px 18px}
+.contour-colors-row{display:flex;gap:5px;align-items:center}
+.contour-color-dot{width:16px;height:16px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s}
+.contour-color-dot.active{border-color:#F4B400}
+.contour-color-dot:hover{border-color:rgba(255,255,255,.5)}
+
+/* ===== HELP TOOLTIPS ===== */
+.help-tip{display:none;position:absolute;background:rgba(10,10,10,.95);border:1px solid rgba(244,180,0,.3);border-radius:5px;padding:6px 10px;font-size:11px;color:rgba(255,255,255,.8);max-width:220px;line-height:1.4;z-index:1010;pointer-events:none;white-space:normal;left:44px;top:50%;transform:translateY(-50%)}
+.help-tip b{color:#F4B400;font-weight:600}
+.help-mode .tool-btn:hover .help-tip{display:block}
+.help-mode .tool-btn .tt{display:none!important}
+.layer-help{font-size:10px;color:rgba(255,255,255,.35);padding:2px 0 2px 22px;display:none;line-height:1.3}
+
 /* ===== LEAFLET OVERRIDES ===== */
 .leaflet-control-zoom a{background:rgba(10,10,10,.9)!important;color:rgba(255,255,255,.7)!important;border-color:rgba(255,255,255,.1)!important;width:36px!important;height:36px!important;line-height:36px!important;font-size:16px!important}
 .leaflet-control-zoom a:hover{background:rgba(30,30,30,.95)!important;color:#F4B400!important}
@@ -248,6 +262,7 @@ body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-seri
   </div>
   <div style="display:flex;align-items:center;gap:8px">
     <span class="brand-badge">Interactive Viewer</span>
+    <div class="tool-btn" id="tool-help" onclick="toggleHelp()" style="width:30px;height:30px;border:1px solid rgba(244,180,0,.2);border-radius:50%;font-size:14px;font-weight:700;font-family:Georgia,serif;color:rgba(255,255,255,.5)">?<span class="tt">Toggle Help Tooltips</span></div>
     <div class="tool-btn" id="tool-fullscreen" onclick="toggleFullscreen()" style="width:30px;height:30px;border:1px solid rgba(244,180,0,.2)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polyline points="15,3 21,3 21,9"/><polyline points="9,21 3,21 3,15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
     </div>
@@ -263,27 +278,27 @@ body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-seri
 
 <!-- TOOLBAR -->
 <div class="toolbar" id="toolbar">
-  <div class="tool-btn" id="tool-single" onclick="activateTool('single')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="19" x2="19" y2="5"/><circle cx="5" cy="19" r="2.5" fill="currentColor" stroke="none"/><circle cx="19" cy="5" r="2.5" fill="currentColor" stroke="none"/></svg><span class="tt">Distance (A\u2192B)</span></div>
-  <div class="tool-btn" id="tool-chain" onclick="activateTool('chain')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,20 9,8 15,16 21,4"/><circle cx="3" cy="20" r="2" fill="currentColor" stroke="none"/><circle cx="9" cy="8" r="2" fill="currentColor" stroke="none"/><circle cx="15" cy="16" r="2" fill="currentColor" stroke="none"/><circle cx="21" cy="4" r="2" fill="currentColor" stroke="none"/></svg><span class="tt">Chain Distance</span></div>
-  <div class="tool-btn" id="tool-area" onclick="activateTool('area')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3,18 9,3 21,6 18,21" fill="rgba(244,180,0,.12)"/></svg><span class="tt">Measure Area</span></div>
-  <div class="tool-btn" id="tool-circle" onclick="activateTool('circle')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="3,2"/><circle cx="3" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="21" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span class="tt">Diameter / Radius</span></div>
-  <div class="tool-btn" id="tool-rect" onclick="activateTool('rect')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1" fill="rgba(244,180,0,.1)"/></svg><span class="tt">Rectangle Area</span></div>
+  <div class="tool-btn" id="tool-single" onclick="activateTool('single')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="19" x2="19" y2="5"/><circle cx="5" cy="19" r="2.5" fill="currentColor" stroke="none"/><circle cx="19" cy="5" r="2.5" fill="currentColor" stroke="none"/></svg><span class="tt">Distance (A&#8594;B)</span><span class="help-tip"><b>Distance</b> &#8212; Click two points to measure straight-line distance</span></div>
+  <div class="tool-btn" id="tool-chain" onclick="activateTool('chain')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,20 9,8 15,16 21,4"/><circle cx="3" cy="20" r="2" fill="currentColor" stroke="none"/><circle cx="9" cy="8" r="2" fill="currentColor" stroke="none"/><circle cx="15" cy="16" r="2" fill="currentColor" stroke="none"/><circle cx="21" cy="4" r="2" fill="currentColor" stroke="none"/></svg><span class="tt">Chain Distance</span><span class="help-tip"><b>Chain Distance</b> &#8212; Click multiple points to measure a path. Double-click to finish</span></div>
+  <div class="tool-btn" id="tool-area" onclick="activateTool('area')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3,18 9,3 21,6 18,21" fill="rgba(244,180,0,.12)"/></svg><span class="tt">Measure Area</span><span class="help-tip"><b>Area</b> &#8212; Click vertices to draw a polygon. Double-click to close and calculate area</span></div>
+  <div class="tool-btn" id="tool-circle" onclick="activateTool('circle')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12" stroke-dasharray="3,2"/><circle cx="3" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="21" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg><span class="tt">Diameter / Radius</span><span class="help-tip"><b>Circle</b> &#8212; Click center, then edge to measure diameter and radius</span></div>
+  <div class="tool-btn" id="tool-rect" onclick="activateTool('rect')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1" fill="rgba(244,180,0,.1)"/></svg><span class="tt">Rectangle Area</span><span class="help-tip"><b>Rectangle</b> &#8212; Click two opposite corners to measure width, height, and area</span></div>
   <div class="tool-div"></div>
-  <div class="tool-btn" id="tool-pin" onclick="activateTool('pin')"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg><span class="tt">Drop Pin</span></div>
-  <div class="tool-btn" id="tool-note" onclick="activateTool('note')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span class="tt">Add Note</span></div>
+  <div class="tool-btn" id="tool-pin" onclick="activateTool('pin')"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg><span class="tt">Drop Pin</span><span class="help-tip"><b>Pin</b> &#8212; Click to drop a location marker with GPS coordinates</span></div>
+  <div class="tool-btn" id="tool-note" onclick="activateTool('note')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg><span class="tt">Add Note</span><span class="help-tip"><b>Note</b> &#8212; Click to place a text annotation on the map</span></div>
   <div class="tool-div"></div>
-  <div class="tool-btn" id="tool-loupe" onclick="toggleLoupe()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg><span class="tt">Magnifier</span></div>
-  <div class="tool-btn" id="tool-compare" onclick="toggleCompare()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><rect x="2" y="5" width="8" height="14" rx="1" fill="rgba(244,180,0,.1)"/><rect x="14" y="5" width="8" height="14" rx="1" fill="rgba(255,255,255,.05)"/></svg><span class="tt">Compare Mode</span></div>
-  <div class="tool-btn" id="tool-report" onclick="showReport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg><span class="tt">Export Report</span></div>
+  <div class="tool-btn" id="tool-loupe" onclick="toggleLoupe()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><line x1="15" y1="15" x2="21" y2="21"/></svg><span class="tt">Magnifier</span><span class="help-tip"><b>Magnifier</b> &#8212; 3x zoom loupe follows your cursor for detail inspection</span></div>
+  <div class="tool-btn" id="tool-compare" onclick="toggleCompare()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="21"/><rect x="2" y="5" width="8" height="14" rx="1" fill="rgba(244,180,0,.1)"/><rect x="14" y="5" width="8" height="14" rx="1" fill="rgba(255,255,255,.05)"/></svg><span class="tt">Compare Mode</span><span class="help-tip"><b>Compare</b> &#8212; Side-by-side slider to compare two flight dates or satellite imagery</span></div>
+  <div class="tool-btn" id="tool-report" onclick="showReport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg><span class="tt">Export Report</span><span class="help-tip"><b>Report</b> &#8212; View, copy, or print all measurements and annotations</span></div>
   <div class="tool-div"></div>
   <!-- Pen / Freehand Draw -->
-  <div class="tool-btn" id="tool-pen" onclick="activateTool('pen')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span class="tt">Freehand Draw</span></div>
+  <div class="tool-btn" id="tool-pen" onclick="activateTool('pen')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span class="tt">Freehand Draw</span><span class="help-tip"><b>Pen</b> &#8212; Draw freely on the map with customizable color and width</span></div>
   <!-- Screenshot -->
-  <div class="tool-btn" id="tool-screenshot" onclick="takeScreenshot()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M3 7l2-2h3"/><path d="M19 7l-2-2h-3"/></svg><span class="tt">Screenshot</span></div>
+  <div class="tool-btn" id="tool-screenshot" onclick="takeScreenshot()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M3 7l2-2h3"/><path d="M19 7l-2-2h-3"/></svg><span class="tt">Screenshot</span><span class="help-tip"><b>Screenshot</b> &#8212; Capture current map view with annotations for download or copy</span></div>
   <!-- Print -->
-  <div class="tool-btn" id="tool-print" onclick="printMap()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span class="tt">Print Map</span></div>
+  <div class="tool-btn" id="tool-print" onclick="printMap()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 6,2 18,2 18,9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg><span class="tt">Print Map</span><span class="help-tip"><b>Print</b> &#8212; Print a branded map report with annotations and coordinates</span></div>
   <div class="tool-div"></div>
-  <div class="tool-btn" id="tool-clear" onclick="clearAll()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span class="tt">Clear All</span></div>
+  <div class="tool-btn" id="tool-clear" onclick="clearAll()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span class="tt">Clear All</span><span class="help-tip"><b>Clear All</b> &#8212; Remove all measurements, pins, notes, and drawings from the map</span></div>
 </div>
 
 <!-- LAYER PANEL -->
@@ -308,11 +323,13 @@ body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-seri
   <div class="lt">Layers</div>
 
   <div class="li" onclick="toggleLayer('ortho')"><div class="lc active" id="check-ortho"></div><span class="ll">Orthomosaic</span></div>
+  <div class="layer-help" id="lh-ortho">High-resolution aerial photo mosaic stitched from drone imagery</div>
   <div class="orow"><span class="olbl">Opacity</span><input type="range" class="oslider" id="op-ortho" min="0" max="100" value="90" oninput="setLayerOp('ortho',this.value)"><span class="oval" id="opval-ortho">90%</span></div>
 
   <div class="ld"></div>
 
   <div class="li" onclick="toggleLayer('satellite')"><div class="lc active" id="check-satellite"></div><span class="ll">Satellite</span></div>
+  <div class="layer-help" id="lh-satellite">Esri World Imagery base map for geographic reference</div>
   <div class="orow"><span class="olbl">Opacity</span><input type="range" class="oslider" id="op-satellite" min="0" max="100" value="100" oninput="setLayerOp('satellite',this.value)"><span class="oval" id="opval-satellite">100%</span></div>
 
   <div class="ld"></div>
@@ -423,16 +440,17 @@ var FLIGHTS = [
     date: 'February 21, 2026',
     label: 'Feb 21, 2026',
     folder: '.',
-    bounds: [[40.31681787617521,-74.24589198549170],[40.32047817458884,-74.24189684928949]]
+    bounds: [[40.31681787617521,-74.24589198549170],[40.32047817458884,-74.24189684928949]],
+    analysisFolder: './analysis'
+  },
+  {
+    id: '2026-03-29',
+    date: 'March 29, 2026',
+    label: 'Mar 29, 2026',
+    folder: 'flight2',
+    bounds: [[40.316664,-74.246256],[40.321256,-74.241831]],
+    analysisFolder: './flight2/analysis'
   }
-  // ADD MORE FLIGHTS HERE:
-  // {
-  //   id: '2026-03-15',
-  //   date: 'March 15, 2026',
-  //   label: 'Mar 15, 2026',
-  //   folder: '2026-03-15',
-  //   bounds: [[40.3168,-74.2459],[40.3205,-74.2419]]
-  // }
 ];
 
 // ============================================================
@@ -475,17 +493,23 @@ var CAD_LAYERS = [
 //                 (apply color ramp, reproject, tile same as above)
 //   Contours:     ogr2ogr -f GeoJSON contours.geojson contours.dxf
 // ============================================================
-var ANALYSIS_LAYERS = [
-  { id: 'dem-heatmap', name: 'Elevation Heatmap', type: 'tiles',
-    url: './analysis/dem-heatmap/{z}/{x}/{y}.png', color: '#FF6B6B',
-    minZoom: 15, maxZoom: 21 },
-  { id: 'hillshade', name: 'Hillshade', type: 'tiles',
-    url: './analysis/hillshade/{z}/{x}/{y}.png', color: '#888888',
-    minZoom: 15, maxZoom: 21 },
- { id: 'contours', name: 'Contour Lines (1ft)', type: 'tiles',
-    url: './analysis/contours/{z}/{x}/{y}.png', color: '#FFFFFF',
-    minZoom: 15, maxZoom: 21 },
-];
+function getAnalysisLayers(folder){
+  return [
+    { id: 'dem-heatmap', name: 'Elevation Heatmap', type: 'tiles',
+      url: folder + '/dem-heatmap/{z}/{x}/{y}.png', color: '#FF6B6B',
+      minZoom: 15, maxZoom: 21, desc: 'Color-coded elevation — blue (low) to red (high)' },
+    { id: 'hillshade', name: 'Hillshade', type: 'tiles',
+      url: folder + '/hillshade/{z}/{x}/{y}.png', color: '#888888',
+      minZoom: 15, maxZoom: 21, desc: 'Simulated sunlight showing terrain relief and shadows' },
+    { id: 'contours', name: 'Contour Lines (1ft)', type: 'tiles',
+      url: folder + '/contours/{z}/{x}/{y}.png', color: '#FFFFFF',
+      minZoom: 15, maxZoom: 21, desc: '1-foot elevation contour lines from bare-earth DTM' },
+    { id: 'slope', name: 'Slope Map', type: 'tiles',
+      url: folder + '/slope/{z}/{x}/{y}.png', color: '#FF9800',
+      minZoom: 15, maxZoom: 21, desc: 'Slope steepness — green (flat) to red (steep, 45°+)' },
+  ];
+}
+var ANALYSIS_LAYERS = getAnalysisLayers(FLIGHTS[0].analysisFolder);
 
 // ============================================================
 // MAP INIT
@@ -496,6 +520,8 @@ var orthoBounds = L.latLngBounds(fl.bounds[0], fl.bounds[1]);
 var center = orthoBounds.getCenter();
 
 var map = L.map('map',{center:center,zoom:18,minZoom:13,maxZoom:23,zoomControl:false,attributionControl:false,doubleClickZoom:false,tap:true});
+map.createPane('contourPane');
+map.getPane('contourPane').style.zIndex = 450;
 L.control.attribution({prefix:false}).addTo(map);
 L.control.zoom({position:'bottomright'}).addTo(map);
 L.control.scale({position:'bottomright',imperial:true,metric:true,maxWidth:150}).addTo(map);
@@ -592,29 +618,50 @@ function initAnalysisLayers(){
     analysisLayerState[a.id] = false;
 
     if(a.type === 'tiles'){
-      analysisLayerObjects[a.id] = L.tileLayer(a.url, {
+      var tileOpts = {
         tms: 0, opacity: 0.7, minZoom: a.minZoom || 15, maxZoom: a.maxZoom || 21,
         maxNativeZoom: a.maxZoom || 21, bounds: orthoBounds,
         errorTileUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
-      });
+      };
+      if(a.id === 'contours') tileOpts.pane = 'contourPane';
+      analysisLayerObjects[a.id] = L.tileLayer(a.url, tileOpts);
     } else if(a.type === 'geojson'){
-      // GeoJSON layers load on first toggle
-      analysisLayerObjects[a.id] = null; // placeholder, loaded on demand
+      analysisLayerObjects[a.id] = null;
     } else if(a.type === 'image'){
       analysisLayerObjects[a.id] = L.imageOverlay(a.url, CAD_BOUNDS, {opacity: 0.7});
     }
 
     var item = document.createElement('div');
-    item.innerHTML =
+    var html =
       '<div class="cad-layer-item" onclick="toggleAnalysisLayer(\''+a.id+'\')">' +
         '<div class="cad-layer-check" id="analysis-check-'+a.id+'"></div>' +
         '<div class="cad-color-dot" style="background:'+a.color+'"></div>' +
         '<span class="cad-layer-name">'+a.name+'</span>' +
-      '</div>' +
-      '<div class="cad-opacity-row">' +
+      '</div>';
+
+    // Help description
+    if(a.desc){
+      html += '<div class="analysis-desc layer-help" style="display:'+(helpActive?'block':'none')+'">'+a.desc+'</div>';
+    }
+
+    // Contour color switcher
+    if(a.id === 'contours'){
+      html += '<div class="contour-colors" id="contour-colors-row">' +
+        '<div class="contour-colors-row">' +
+        '<div class="contour-color-dot active" style="background:#FFFFFF" onclick="event.stopPropagation();switchContourColor(\'#FFFFFF\',this)"></div>' +
+        '<div class="contour-color-dot" style="background:#F4B400" onclick="event.stopPropagation();switchContourColor(\'#F4B400\',this)"></div>' +
+        '<div class="contour-color-dot" style="background:#00DDFF" onclick="event.stopPropagation();switchContourColor(\'#00DDFF\',this)"></div>' +
+        '<div class="contour-color-dot" style="background:#FF3B30" onclick="event.stopPropagation();switchContourColor(\'#FF3B30\',this)"></div>' +
+        '<div class="contour-color-dot" style="background:#34C759" onclick="event.stopPropagation();switchContourColor(\'#34C759\',this)"></div>' +
+        '</div></div>';
+    }
+
+    html += '<div class="cad-opacity-row">' +
         '<input type="range" class="oslider" min="0" max="100" value="70" oninput="setAnalysisOp(\''+a.id+'\',this.value)">' +
         '<span class="oval" id="analysis-opval-'+a.id+'">70%</span>' +
       '</div>';
+
+    item.innerHTML = html;
     listEl.appendChild(item);
   });
 }
@@ -639,7 +686,6 @@ function toggleAnalysisLayer(id){
 
   if(analysisLayerState[id]){
     if(cfg.type === 'geojson' && !analysisLayerObjects[id]){
-      // Load GeoJSON on first toggle
       fetch(cfg.url).then(function(r){ return r.json(); }).then(function(data){
         analysisLayerObjects[id] = L.geoJSON(data, {
           style: { color: cfg.color, weight: cfg.weight || 1, opacity: 0.7, dashArray: cfg.dashArray || null, fillOpacity: 0 }
@@ -648,8 +694,18 @@ function toggleAnalysisLayer(id){
     } else if(analysisLayerObjects[id]){
       analysisLayerObjects[id].addTo(map);
     }
+    // Show contour color picker
+    if(id === 'contours'){
+      var ccRow = document.getElementById('contour-colors-row');
+      if(ccRow) ccRow.style.display = 'block';
+    }
   } else {
     if(analysisLayerObjects[id]) map.removeLayer(analysisLayerObjects[id]);
+    // Hide contour color picker
+    if(id === 'contours'){
+      var ccRow = document.getElementById('contour-colors-row');
+      if(ccRow) ccRow.style.display = 'none';
+    }
   }
 }
 
@@ -711,8 +767,17 @@ function switchFlight(idx){
   orthoBounds=L.latLngBounds(f.bounds[0],f.bounds[1]);
 
   map.removeLayer(orthoLayer);
-  orthoLayer=L.tileLayer(tileUrl(f.folder),{tms:0,opacity:document.getElementById('op-ortho').value/100,minZoom:15,maxZoom:23,maxNativeZoom:21,bounds:orthoBounds}).addTo(map);
+  orthoLayer=L.tileLayer(tileUrl(f.folder),{tms:0,opacity:document.getElementById('op-ortho').value/100,minZoom:15,maxZoom:23,maxNativeZoom:21,bounds:orthoBounds,errorTileUrl:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='}).addTo(map);
   if(!layerState.ortho) map.removeLayer(orthoLayer);
+
+  // Swap analysis layers for new flight date
+  ANALYSIS_LAYERS.forEach(function(a){
+    if(analysisLayerState[a.id] && analysisLayerObjects[a.id]){
+      map.removeLayer(analysisLayerObjects[a.id]);
+    }
+  });
+  ANALYSIS_LAYERS = getAnalysisLayers(f.analysisFolder);
+  initAnalysisLayers();
 
   document.getElementById('ds-text').innerHTML='Flight Date: <strong>'+f.date+'</strong>';
   map.fitBounds(orthoBounds,{padding:[60,60]});
@@ -1314,6 +1379,55 @@ document.addEventListener('fullscreenchange', function(){
     document.getElementById('tool-fullscreen').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polyline points="15,3 21,3 21,9"/><polyline points="9,21 3,21 3,15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>';
   }
 });
+
+// ============================================================
+// HELP TOOLTIP SYSTEM
+// ============================================================
+var helpActive = false;
+
+function toggleHelp(){
+  helpActive = !helpActive;
+  document.getElementById('tool-help').classList.toggle('active', helpActive);
+  document.body.classList.toggle('help-mode', helpActive);
+
+  // Toggle layer help descriptions
+  document.querySelectorAll('.layer-help').forEach(function(el){
+    el.style.display = helpActive ? 'block' : 'none';
+  });
+
+  // Show/hide analysis layer descriptions
+  document.querySelectorAll('.analysis-desc').forEach(function(el){
+    el.style.display = helpActive ? 'block' : 'none';
+  });
+}
+
+// ============================================================
+// CONTOUR COLOR SWITCHER
+// ============================================================
+var contourColors = ['#FFFFFF','#F4B400','#00DDFF','#FF3B30','#34C759'];
+var currentContourColor = '#FFFFFF';
+
+function switchContourColor(color, el){
+  currentContourColor = color;
+  document.querySelectorAll('.contour-color-dot').forEach(function(d){ d.classList.remove('active'); });
+  el.classList.add('active');
+
+  // Apply CSS filter to the contour pane
+  var pane = map.getPane('contourPane');
+  if(pane){
+    if(color === '#FFFFFF'){
+      pane.style.filter = 'none';
+    } else if(color === '#F4B400'){
+      pane.style.filter = 'sepia(1) saturate(5) hue-rotate(15deg) brightness(1.1)';
+    } else if(color === '#00DDFF'){
+      pane.style.filter = 'sepia(1) saturate(5) hue-rotate(160deg) brightness(1.3)';
+    } else if(color === '#FF3B30'){
+      pane.style.filter = 'sepia(1) saturate(5) hue-rotate(-20deg) brightness(1.1)';
+    } else if(color === '#34C759'){
+      pane.style.filter = 'sepia(1) saturate(5) hue-rotate(90deg) brightness(1.1)';
+    }
+  }
+}
 
 // ============================================================
 // KEYBOARD
