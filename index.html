@@ -429,6 +429,12 @@ body{background:#0a0a0a;font-family:'Segoe UI',system-ui,-apple-system,sans-seri
 
 <script>
 // ============================================================
+// TILE HOSTING — Cloudflare R2
+// Change TILE_BASE to switch between local and R2-hosted tiles
+// ============================================================
+var TILE_BASE = 'https://pub-1dc71e0f567c4efdb20b6e4c7194c209.r2.dev/marlboro';
+
+// ============================================================
 // FLIGHT CONFIG — ADD NEW FLIGHTS HERE
 // Each entry: { id, date, label, folder, bounds }
 // folder = subfolder name containing tiles (z/x/y.png)
@@ -441,7 +447,7 @@ var FLIGHTS = [
     label: 'Feb 21, 2026',
     folder: '.',
     bounds: [[40.31681787617521,-74.24589198549170],[40.32047817458884,-74.24189684928949]],
-    analysisFolder: './analysis'
+    analysisFolder: TILE_BASE + '/analysis'
   },
   {
     id: '2026-03-29',
@@ -449,7 +455,7 @@ var FLIGHTS = [
     label: 'Mar 29, 2026',
     folder: 'flight2',
     bounds: [[40.316664,-74.246256],[40.321256,-74.241831]],
-    analysisFolder: './flight2/analysis'
+    analysisFolder: TILE_BASE + '/flight2/analysis'
   }
 ];
 
@@ -463,7 +469,7 @@ var CAD_BOUNDS = [[40.31681787617521,-74.24589198549170],[40.32047817458884,-74.
 
 var CAD_LAYERS = [
   // UNCOMMENT AND ADD YOUR CAD DRAWINGS:
-  { id: 'site-plan', name: 'Site Plan (Rt 79 & Stevenson)', url: './cad/marlboro_siteplan_cad.png', color: '#00DDFF', bounds: [[40.317724,-74.246742],[40.321244,-74.242759]] },
+  { id: 'site-plan', name: 'Site Plan (Rt 79 & Stevenson)', url: TILE_BASE + '/cad/marlboro_siteplan_cad.png', color: '#00DDFF', bounds: [[40.317724,-74.246742],[40.321244,-74.242759]] },
   // { id: 'grading', name: 'Grading Plan', url: './cad/grading.png', color: '#FF9800' },
   // { id: 'sewer', name: 'Sewer', url: './cad/sewer.png', color: '#4CAF50' },
   // { id: 'water', name: 'Water', url: './cad/water.png', color: '#2196F3' },
@@ -529,7 +535,7 @@ L.control.scale({position:'bottomright',imperial:true,metric:true,maxWidth:150})
 // ============================================================
 // LAYERS
 // ============================================================
-function tileUrl(folder){return './' + (folder==='.'?'':folder+'/') + '{z}/{x}/{y}.png'}
+function tileUrl(folder){return TILE_BASE + '/' + (folder==='.'?'':folder+'/') + '{z}/{x}/{y}.png'}
 
 var blackBg = L.tileLayer('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',{minZoom:13,maxZoom:23}).addTo(map);
 var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'&copy; Esri',minZoom:13,maxZoom:23,maxNativeZoom:19}).addTo(map);
